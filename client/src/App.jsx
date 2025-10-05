@@ -11,7 +11,7 @@ function App() {
   };
 
   useEffect(() => {
-    fetch("https://twilio-app-backend.onrender.com/token")
+    fetch("https://twilio-voice-backend-f5sm.onrender.com/token")
       .then((res) => res.json())
       .then((data) => {
         const newDevice = new Device(data.token, { debug: true });
