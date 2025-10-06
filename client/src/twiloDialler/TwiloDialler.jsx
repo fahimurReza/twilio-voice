@@ -60,6 +60,10 @@ const TwiloDialler = () => {
     setDialedNumber((prev) => prev + digit);
   };
 
+  const handleDelete = () => {
+    setDialedNumber((prev) => prev.slice(0, -1));
+  };
+
   const handleClear = () => {
     setDialedNumber("");
   };
@@ -71,11 +75,10 @@ const TwiloDialler = () => {
       <input
         type="text"
         value={dialedNumber}
-        readOnly
         placeholder="Enter number"
         className="mb-4 px-4 py-2 w-48 text-center border rounded text-lg"
       />
-      <DialPad onPress={handleDialPress} />
+      <DialPad onPress={handleDialPress} onDelete={handleDelete} />
       {/* Clear Button */}
       <button
         onClick={handleClear}
