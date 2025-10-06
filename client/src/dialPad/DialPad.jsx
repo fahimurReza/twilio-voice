@@ -8,6 +8,9 @@ const DialPad = ({ onPress, onDelete }) => {
   // Keyboard input support
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // 👇 Ignore keyboard events when the input field is focused
+      if (document.activeElement.tagName === "INPUT") return;
+
       const key = e.key;
 
       if (buttons.includes(key)) {
@@ -20,7 +23,6 @@ const DialPad = ({ onPress, onDelete }) => {
     };
 
     window.addEventListener("keydown", handleKeyDown);
-
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
