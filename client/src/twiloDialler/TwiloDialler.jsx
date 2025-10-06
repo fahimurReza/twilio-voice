@@ -6,13 +6,12 @@ const TwiloDialler = () => {
   const [device, setDevice] = useState(null);
   const [callInProgress, setCallInProgress] = useState(false);
   const [dialedNumber, setDialedNumber] = useState(""); // only digits
+  const [formattedNumber, setFormattedNumber] = useState(""); // display formatted
   const [errorMessage, setErrorMessage] = useState("");
-  const inputRef = useRef(null);
 
-  // Format number for display as (XXX) XXX-XXXX
-  const formatNumber = (num) => {
-    const digits = num.replace(/\D/g, "");
-    if (!digits) return "";
+  // Format digits as (XXX) XXX-XXXX
+  const formatNumber = (digits) => {
+    if (!digits) return ""; // return empty string if no digits typed
     const area = digits.slice(0, 3);
     const part1 = digits.slice(3, 6);
     const part2 = digits.slice(6, 10);
@@ -21,34 +20,35 @@ const TwiloDialler = () => {
     if (digits.length <= 6) return `(${area}) ${part1}`;
     return `(${area}) ${part1}-${part2}`;
   };
-
   // Setup Twilio Device
-  const setupDevice = (device) => {
-    device.on("ready", () => console.log("Device ready"));
-    device.on("error", (err) => console.error(err));
-  };
-
   useEffect(() => {
     fetch("https://twilio-voice-backend-f5sm.onrender.com/token")
       .then((res) => res.json())
       .then((data) => {
         const newDevice = new Device(data.token, { debug: true });
-        setupDevice(newDevice);
+        newDevice.on("ready", () => console.log("Device ready"));
+        newDevice.on("error", (err) => console.error(err));
         setDevice(newDevice);
       })
       .catch((err) => console.error(err));
   }, []);
 
-  // Make Call
+  // Update formatted number whenever dialedNumber changes
+  useEffect(() => {
+    setFormattedNumber(formatNumber(dialedNumber));
+  }, [dialedNumber]);
+
+  const handleInputChange = (e) => {
+    const cursorPos = e.target.selectionStart;
+    let digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+    setDialedNumber(digits);
+  };
+
   const makeCall = async () => {
     if (!device) return;
 
-    // Prepend +1 for Twilio
-    let numberToCall = "+1" + dialedNumber;
-
-    // Validate 11-digit E.164 number
-    const isValidNumber = /^\+1\d{10}$/.test(numberToCall);
-    if (!isValidNumber) {
+    const numberToCall = "+1" + dialedNumber;
+    if (!/^\+1\d{10}$/.test(numberToCall)) {
       setErrorMessage("Invalid Number");
       setCallInProgress(false);
       return;
@@ -57,9 +57,8 @@ const TwiloDialler = () => {
     try {
       setErrorMessage("");
       setCallInProgress(true);
-
+      // makin the call
       const connection = await device.connect({ params: { To: numberToCall } });
-
       // Handle remote hangup or disconnect
       connection.on("disconnect", () => setCallInProgress(false));
       connection.on("cancel", () => setCallInProgress(false));
@@ -73,7 +72,6 @@ const TwiloDialler = () => {
     }
   };
 
-  // Hang Up
   const hangUpCall = () => {
     if (device) {
       device.disconnectAll();
@@ -81,55 +79,32 @@ const TwiloDialler = () => {
     }
   };
 
-  // DialPad handlers
   const handleDialPress = (digit) => {
-    if (dialedNumber.length >= 10) return; // max 10 digits for US
-    setErrorMessage("");
-    setDialedNumber((prev) => prev + digit);
-  };
-
-  const handleDelete = () => {
-    setErrorMessage("");
-    setDialedNumber((prev) => prev.slice(0, -1));
-  };
-
-  const handleClear = () => {
-    setDialedNumber("");
+    if (dialedNumber.length < 10) setDialedNumber(dialedNumber + digit);
     setErrorMessage("");
   };
 
-  // Keep cursor at end
-  const formattedNumber = formatNumber(dialedNumber);
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.selectionStart = inputRef.current.selectionEnd =
-        inputRef.current.value.length;
-    }
-  }, [formattedNumber]);
+  const handleDelete = () => setDialedNumber(dialedNumber.slice(0, -1));
+  const handleClear = () => setDialedNumber("");
 
   return (
     <div className="App flex flex-col justify-center items-center h-screen">
       <h1 className="mb-4 text-2xl font-bold">Twilio Voice Client</h1>
 
-      {/* Number Display */}
       <input
         type="text"
-        ref={inputRef}
         value={formattedNumber}
         placeholder="Enter number"
-        readOnly
         className="mb-2 px-4 py-2 w-56 text-center border rounded text-lg"
+        onChange={handleInputChange}
       />
 
-      {/* Error Message */}
       {errorMessage && (
         <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
       )}
 
-      {/* DialPad */}
       <DialPad onPress={handleDialPress} onDelete={handleDelete} />
 
-      {/* Clear */}
       <button
         onClick={handleClear}
         className="mb-4 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
@@ -137,7 +112,6 @@ const TwiloDialler = () => {
         Clear
       </button>
 
-      {/* Action Buttons */}
       <div className="flex space-x-2">
         <button
           onClick={makeCall}
