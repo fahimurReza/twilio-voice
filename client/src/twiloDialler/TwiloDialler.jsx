@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Device } from "@twilio/voice-sdk";
 import DialPad from "../dialPad/DialPad";
 import { FaPhoneAlt } from "react-icons/fa";
+import { FaBackspace } from "react-icons/fa";
 
 const TwiloDialler = () => {
   const [device, setDevice] = useState(null);
@@ -110,44 +111,53 @@ const TwiloDialler = () => {
   const isCallDisabled = !device || rawInput.trim().length === 0;
 
   return (
-    <div className="App flex flex-col justify-center items-center h-screen my-8">
-      <input
-        type="text"
-        value={rawInput}
-        placeholder="Enter number"
-        className="mb-2 px-4 py-2 w-56 text-center border rounded text-lg"
-        onChange={handleInputChange}
-      />
-      {statusMessage && (
-        <p className="text-green-600 text-sm mt-1">{statusMessage}</p>
-      )}
-      {errorMessage && (
-        <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
-      )}
+    <div className="flex justify-center items-center h-screen">
+      <div className="flex flex-col justify-center items-center border rounded-xl shadow-md p-6 w-80 bg-white">
+        <input
+          type="text"
+          value={rawInput}
+          placeholder="Enter number"
+          className="w-full mb-2 px-4 py-2 text-center border rounded text-lg"
+          onChange={handleInputChange}
+        />
 
-      <DialPad onPress={handleDialPress} onDelete={handleDelete} />
+        {statusMessage && (
+          <p className="text-green-600 text-sm mt-1">{statusMessage}</p>
+        )}
+        {errorMessage && (
+          <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
+        )}
 
-      <button
-        onClick={handleClear}
-        className="mb-4 px-4 py-2 bg-gray-300 text-black rounded hover:bg-gray-400"
-      >
-        Clear
-      </button>
+        <DialPad onPress={handleDialPress} onDelete={handleDelete} />
 
-      <div className="flex space-x-2">
-        <button
-          onClick={handleCall}
-          disabled={isCallDisabled}
-          className={`mr-2 px-4 py-4 rounded-full transition ${
-            callInProgress ? "bg-red-500" : "bg-green-400 hover:bg-green-500"
-          }`}
-        >
-          <FaPhoneAlt
-            size={25}
-            color="white"
-            className={callInProgress ? "rotate-135" : ""}
-          />
-        </button>
+        <div className="relative flex justify-center items-center w-full mt-4">
+          {/* Call Button */}
+          <button
+            onClick={handleCall}
+            disabled={isCallDisabled}
+            className={`px-4 py-4 rounded-full transition ${
+              callInProgress ? "bg-red-500" : "bg-blue-600 hover:bg-blue-800"
+            }`}
+          >
+            <FaPhoneAlt
+              size={25}
+              color="white"
+              className={callInProgress ? "rotate-135" : ""}
+            />
+          </button>
+
+          {/* Clear Button */}
+          <button
+            onClick={handleClear}
+            className={`absolute right-2 transition-opacity duration-300 ${
+              rawInput
+                ? "opacity-100 pointer-events-auto"
+                : "opacity-0 pointer-events-none"
+            }`}
+          >
+            <FaBackspace size={30} color="gray" />
+          </button>
+        </div>
       </div>
     </div>
   );

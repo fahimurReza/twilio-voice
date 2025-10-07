@@ -3,36 +3,47 @@ import React, { useState, useEffect } from "react";
 const DialPad = ({ onPress, onDelete }) => {
   const [longPressTimer, setLongPressTimer] = useState(null);
   const [longPressTriggered, setLongPressTriggered] = useState(false);
-  const buttons = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "*", "0", "#"];
+
+  // Each button with its letters
+  const buttons = [
+    { digit: "1", letters: "" },
+    { digit: "2", letters: "ABC" },
+    { digit: "3", letters: "DEF" },
+    { digit: "4", letters: "GHI" },
+    { digit: "5", letters: "JKL" },
+    { digit: "6", letters: "MNO" },
+    { digit: "7", letters: "PQRS" },
+    { digit: "8", letters: "TUV" },
+    { digit: "9", letters: "WXYZ" },
+    { digit: "*", letters: "" },
+    { digit: "0", letters: "+" },
+    { digit: "#", letters: "" },
+  ];
 
   // Keyboard input support
   useEffect(() => {
     const handleKeyDown = (e) => {
-      // 👇 Ignore keyboard events when the input field is focused
       if (document.activeElement.tagName === "INPUT") return;
-
       const key = e.key;
 
-      if (buttons.includes(key)) {
+      if (buttons.some((b) => b.digit === key)) {
         onPress(key);
       } else if (key === "+") {
         onPress("+");
       } else if (key === "Backspace") {
-        onDelete(); // call delete function for backspace
+        onDelete();
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [onPress, onDelete, buttons]);
 
   const handlePressStart = (btn) => {
     if (btn === "0") {
       setLongPressTriggered(false);
       const timer = setTimeout(() => {
-        onPress("+"); // Long press triggers "+"
+        onPress("+");
         setLongPressTriggered(true);
       }, 500);
       setLongPressTimer(timer);
@@ -43,31 +54,32 @@ const DialPad = ({ onPress, onDelete }) => {
     if (btn === "0") {
       clearTimeout(longPressTimer);
       setLongPressTimer(null);
-      if (!longPressTriggered) {
-        onPress("0");
-      }
+      if (!longPressTriggered) onPress("0");
     }
   };
 
   const handleClick = (btn) => {
-    if (btn !== "0") {
-      onPress(btn);
-    }
+    if (btn !== "0") onPress(btn);
   };
 
   return (
-    <div className="grid grid-cols-3 gap-6 my-8">
-      {buttons.map((btn) => (
+    <div className="grid grid-cols-3 gap-6 mt-8 mb-4">
+      {buttons.map(({ digit, letters }) => (
         <button
-          key={btn}
-          onMouseDown={() => handlePressStart(btn)}
-          onMouseUp={() => handlePressEnd(btn)}
-          onTouchStart={() => handlePressStart(btn)}
-          onTouchEnd={() => handlePressEnd(btn)}
-          onClick={() => handleClick(btn)}
-          className="px-4 py-4 bg-gray-200 rounded text-lg hover:bg-gray-300"
+          key={digit}
+          onMouseDown={() => handlePressStart(digit)}
+          onMouseUp={() => handlePressEnd(digit)}
+          onTouchStart={() => handlePressStart(digit)}
+          onTouchEnd={() => handlePressEnd(digit)}
+          onClick={() => handleClick(digit)}
+          className="w-16 h-16 flex flex-col justify-center items-center bg-gray-200 rounded-full hover:bg-gray-300 transition shadow-sm"
         >
-          {btn}
+          <span className="text-xl font-semibold leading-none">{digit}</span>
+          {letters && (
+            <span className="text-[10px] text-gray-600 mt-1 tracking-wider">
+              {letters}
+            </span>
+          )}
         </button>
       ))}
     </div>
