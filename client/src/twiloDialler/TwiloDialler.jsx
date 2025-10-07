@@ -112,13 +112,17 @@ const TwiloDialler = () => {
 
   return (
     <div className="flex justify-center items-center h-screen">
-      <div className="flex flex-col justify-center items-center border rounded-xl shadow-md p-6 w-80 bg-white">
+      <div
+        className="flex flex-col justify-center items-center rounded-xl shadow-2xl 
+        px-6 pt-7 pb-8 w-80 bg-white"
+      >
         <input
           type="text"
           value={rawInput}
-          placeholder="Enter number"
-          className="w-full mb-2 px-4 py-2 text-center border rounded text-lg"
           onChange={handleInputChange}
+          placeholder="Enter number"
+          className="w-full mb-2 px-4 py-2 text-center border border-gray-300 
+          focus:outline-none focus:ring-1 focus:ring-gray-400 rounded text-lg"
         />
 
         {statusMessage && (
@@ -149,7 +153,7 @@ const TwiloDialler = () => {
           {/* Clear Button */}
           <button
             onClick={handleClear}
-            className={`absolute right-2 transition-opacity duration-300 ${
+            className={`absolute right-4 transition-opacity duration-300 ${
               rawInput
                 ? "opacity-100 pointer-events-auto"
                 : "opacity-0 pointer-events-none"
