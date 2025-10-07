@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Device } from "@twilio/voice-sdk";
+import Select from "react-select";
 import DialPad from "../dialPad/DialPad";
 import { FaPhoneAlt } from "react-icons/fa";
 import { FaBackspace } from "react-icons/fa";
+
+import { customStyles } from "../style/reactSelectStyles";
 
 const TwiloDialler = () => {
   const [device, setDevice] = useState(null);
@@ -10,6 +13,12 @@ const TwiloDialler = () => {
   const [rawInput, setRawInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
+  const [fromNumber, setFromNumber] = useState("");
+
+  const twilioNumbers = [
+    { label: "Asheboro Tree", value: "+13365230067" },
+    { label: "Plano Concrete", value: "+14694094540" },
+  ];
 
   // Store active Call instance
   const activeCall = useRef(null);
@@ -116,13 +125,26 @@ const TwiloDialler = () => {
         className="flex flex-col justify-center items-center rounded-xl shadow-2xl 
         px-6 pt-7 pb-8 w-80 bg-white"
       >
+        <div className="w-full mb-2">
+          <Select
+            value={twilioNumbers.find((bus) => bus.value === fromNumber)}
+            onChange={(selected) =>
+              setFromNumber(selected ? selected.value : "")
+            }
+            options={twilioNumbers}
+            placeholder="Select Business"
+            styles={customStyles}
+            isSearchable={false}
+          />
+        </div>
+
         <input
           type="text"
           value={rawInput}
           onChange={handleInputChange}
           placeholder="Enter number"
           className="w-full mb-2 px-4 py-2 text-center border border-gray-300 
-          focus:outline-none focus:ring-1 focus:ring-gray-400 rounded text-lg"
+          focus:outline-none focus:border-gray-400 hover:border-gray-400 rounded text-lg"
         />
 
         {statusMessage && (
