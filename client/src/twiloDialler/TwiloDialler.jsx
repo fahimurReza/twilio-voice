@@ -25,7 +25,10 @@ const TwiloDialler = () => {
 
   // Setup Twilio Device
   useEffect(() => {
-    fetch("https://twilio-voice-backend-f5sm.onrender.com/token")
+    if (!fromNumber) return;
+    fetch(
+      `https://twilio-voice-backend-f5sm.onrender.com/token?from=${fromNumber}`
+    )
       .then((res) => res.json())
       .then((data) => {
         const newDevice = new Device(data.token, { debug: true });
@@ -34,7 +37,7 @@ const TwiloDialler = () => {
         setDevice(newDevice);
       })
       .catch((err) => console.error(err));
-  }, []);
+  }, [fromNumber]);
 
   // Format digits as (XXX) XXX-XXXX
   const formatNumber = (digits) => {
@@ -87,7 +90,9 @@ const TwiloDialler = () => {
     setErrorMessage("");
 
     try {
-      const newCall = await device.connect({ params: { To: numberToCall } });
+      const newCall = await device.connect({
+        params: { To: numberToCall, From: fromNumber },
+      });
       activeCall.current = newCall;
       setCallInProgress(true);
 

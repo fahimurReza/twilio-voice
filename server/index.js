@@ -50,9 +50,14 @@ app.all("/voice", (req, res) => {
     req.query?.To ||
     "+15551234567";
 
-  const dial = twiml.dial({
-    callerId: process.env.TWILIO_NUMBER,
-  });
+  const fromNumber =
+    req.body?.From ||
+    req.body?.from ||
+    req.body?.params?.From ||
+    req.query?.From ||
+    process.env.TWILIO_NUMBER; // fallback to default
+
+  const dial = twiml.dial({ callerId: fromNumber });
   dial.number(toNumber);
 
   res.type("text/xml");
