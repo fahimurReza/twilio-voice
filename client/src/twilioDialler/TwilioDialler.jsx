@@ -86,11 +86,6 @@ const TwilioDialler = () => {
     const digits = rawInput.replace(/\D/g, "").slice(-10);
     setRawInput(formatNumber(digits));
 
-    if (digits.length !== 10) {
-      setErrorMessage("Invalid Number");
-      return;
-    }
-
     const numberToCall = "+1" + digits;
     setStatusMessage("Calling...");
     setErrorMessage("");
@@ -107,16 +102,9 @@ const TwilioDialler = () => {
       newCall.on("disconnect", () => {
         setCallInProgress(false);
         setStatusMessage("Call Ended");
-        activeCall.current = null;
-      });
-      newCall.on("cancel", () => {
-        setCallInProgress(false);
-        setStatusMessage("Call Cancelled");
-        activeCall.current = null;
-      });
-      newCall.on("failed", () => {
-        setCallInProgress(false);
-        setStatusMessage("Call Failed");
+        setTimeout(() => {
+          setStatusMessage("");
+        }, 3000);
         activeCall.current = null;
       });
     } catch (err) {
@@ -158,12 +146,14 @@ const TwilioDialler = () => {
           focus:outline-none focus:border-gray-400 hover:border-gray-400 rounded text-lg"
         />
 
-        {statusMessage && (
-          <p className="text-green-600 text-sm mt-1">{statusMessage}</p>
-        )}
-        {errorMessage && (
-          <p className="text-red-500 text-sm mt-1">{errorMessage}</p>
-        )}
+        <div className="h-1 flex items-center justify-center pt-4">
+          {statusMessage && (
+            <p className="text-green-600 text-sm">{statusMessage}</p>
+          )}
+          {errorMessage && (
+            <p className="text-red-500 text-sm">{errorMessage}</p>
+          )}
+        </div>
 
         <DialPad onPress={handleDialPress} onDelete={handleDelete} />
 
