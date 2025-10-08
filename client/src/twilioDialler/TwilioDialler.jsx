@@ -97,10 +97,6 @@ const TwilioDialler = () => {
     if (!fromNumber) {
       setIsSelectError(true);
       setErrorMessage("Please Select a Business");
-      setTimeout(() => {
-        setIsSelectError(false);
-        setErrorMessage("");
-      }, 1000);
       return;
     }
     if (!device) return;
@@ -141,13 +137,14 @@ const TwilioDialler = () => {
       newCall.on("disconnect", () => {
         setCallInProgress(false);
         setStatusMessage("Call Ended");
+        setFromNumber("");
         if (callTimerRef.current) {
           clearInterval(callTimerRef.current);
           callTimerRef.current = null;
         }
         setTimeout(() => {
           setStatusMessage("");
-        }, 2000);
+        }, 4000);
         activeCall.current = null;
       });
     } catch (err) {
@@ -167,7 +164,11 @@ const TwilioDialler = () => {
       >
         <div className="w-full mb-2">
           <Select
-            value={twilioNumbers.find((bus) => bus.value === fromNumber)}
+            value={
+              fromNumber
+                ? twilioNumbers.find((bus) => bus.value === fromNumber)
+                : null
+            }
             onChange={(selected) => {
               setFromNumber(selected ? selected.value : "");
               setIsSelectError(false);
@@ -197,6 +198,9 @@ const TwilioDialler = () => {
             onFocus={() => setIsInputFocused(true)}
             onBlur={() => setIsInputFocused(false)}
             onChange={handleInputChange}
+            onKeyDown={(e) => {
+              e.key === "Enter" && handleCall();
+            }}
             placeholder={isInputFocused ? "999-999-9999" : "Enter number"}
             className={`flex-1 pr-4 py-2 text-[18px] font-semibold placeholder:text-lg bg-transparent
             placeholder:font-normal placeholder:text-gray-500 focus:outline-none 
@@ -206,11 +210,11 @@ const TwilioDialler = () => {
 
         <div className="h-1 flex items-center justify-center pt-4">
           {callInProgress && callTimerRef.current ? (
-            <p className="text-green-600 text-sm">
+            <p className="text-green-600 text-base">
               {timeFormatter(callDuration)}
             </p>
           ) : statusMessage ? (
-            <p className="text-green-600 text-sm">{statusMessage}</p>
+            <p className="text-green-600 text-base">{statusMessage}</p>
           ) : errorMessage ? (
             <p className="text-red-500 text-base">{errorMessage}</p>
           ) : null}
@@ -223,7 +227,7 @@ const TwilioDialler = () => {
           <button
             onClick={handleCall}
             className={`px-4 py-4 rounded-full transition ${
-              callInProgress ? "bg-red-500" : "bg-blue-600 hover:bg-blue-800"
+              callInProgress ? "bg-red-500" : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
             <FaPhoneAlt
