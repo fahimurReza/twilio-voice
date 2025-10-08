@@ -7,7 +7,7 @@ import { FaBackspace } from "react-icons/fa";
 
 import { customStyles } from "../style/reactSelectStyles";
 
-const TwiloDialler = () => {
+const TwilioDialler = () => {
   const [device, setDevice] = useState(null);
   const [callInProgress, setCallInProgress] = useState(false);
   const [rawInput, setRawInput] = useState("");
@@ -191,4 +191,4 @@ const TwiloDialler = () => {
   );
 };
 
-export default TwiloDialler;
+export default TwilioDialler;

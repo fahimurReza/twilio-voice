@@ -1,10 +1,10 @@
 import React from "react";
-import TwiloDialler from "./twiloDialler/TwiloDialler";
+import TwilioDialler from "./twilioDialler/TwilioDialler";
 
 const App = () => {
   return (
     <div>
-      <TwiloDialler />
+      <TwilioDialler />
     </div>
   );
 };
