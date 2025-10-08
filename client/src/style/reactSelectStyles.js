@@ -2,7 +2,7 @@ export const customStyles = {
   control: (provided, state) => ({
     ...provided,
     width: "100%", // full width
-    backgroundColor: "white",
+    backgroundColor: "#f1f6fd",
     borderColor: state.isFocused ? "#9ca3af" : "#d1d5db", // neutral gray-400 / gray-300
     boxShadow: "none",
     "&:hover": { borderColor: "#a1a1aa" },

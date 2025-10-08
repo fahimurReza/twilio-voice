@@ -16,6 +16,7 @@ const TwilioDialler = () => {
   const [statusMessage, setStatusMessage] = useState("");
   const [fromNumber, setFromNumber] = useState("");
   const [callDuration, setCallDuration] = useState(0);
+  const [isInputFocused, setIsInputFocused] = useState(false);
 
   const twilioNumbers = [
     { label: "Asheboro Tree", value: "+13365230067" },
@@ -57,19 +58,33 @@ const TwilioDialler = () => {
 
   // Input & DialPad handlers
   const handleInputChange = (e) => {
-    const digits = e.target.value.replace(/\D/g, "").slice(0, 10); // keep only digits
-    setRawInput(formatNumber(digits));
+    const allDigits = e.target.value.replace(/\D/g, "");
+    let phoneDigits = allDigits;
+    if (allDigits.length > 10 && allDigits.startsWith("1")) {
+      phoneDigits = allDigits.slice(1, 11);
+    } else {
+      phoneDigits = allDigits.slice(0, 10);
+    }
+    setRawInput(formatNumber(phoneDigits));
   };
   const handleDialPress = (digit) => {
-    const digits = (rawInput.replace(/\D/g, "") + digit).slice(0, 10);
-    setRawInput(formatNumber(digits));
+    const currentDigits = rawInput.replace(/\D/g, "");
+    const newDigits = (currentDigits + digit).slice(0, 10);
+    setRawInput(formatNumber(newDigits));
     setErrorMessage("");
   };
-  const handleDelete = () => setRawInput((prev) => prev.slice(0, -1));
+  const handleDelete = () => {
+    const currentDigits = rawInput.replace(/\D/g, "");
+    const newDigits = currentDigits.slice(0, -1);
+    setRawInput(formatNumber(newDigits));
+  };
   const handleClearPressStart = () => {
     clearIntervalRef.current = setInterval(() => {
-      setRawInput((prev) => prev.slice(0, -1));
-    }, 150); // 150ms between deletions
+      setRawInput((prev) => {
+        const currentDigits = prev.replace(/\D/g, "");
+        return formatNumber(currentDigits.slice(0, -1));
+      });
+    }, 150);
   };
   const handleClearPressEnd = () => {
     clearInterval(clearIntervalRef.current);
@@ -90,7 +105,7 @@ const TwilioDialler = () => {
     }
 
     // Otherwise, start a new call
-    const digits = rawInput.replace(/\D/g, "").slice(-10);
+    const digits = rawInput.replace(/\D/g, "");
     setRawInput(formatNumber(digits));
 
     const numberToCall = "+1" + digits;
@@ -155,16 +170,28 @@ const TwilioDialler = () => {
           />
         </div>
 
-        <input
-          type="text"
-          value={rawInput}
-          onChange={handleInputChange}
-          placeholder="Enter number"
-          className="w-full mb-2 px-4 py-2 text-center border border-gray-300 
-          focus:outline-none focus:border-gray-400 hover:border-gray-400 
-          rounded text-[18px] font-semibold placeholder:text-lg placeholder:font-normal 
-          placeholder:text-gray-500"
-        />
+        <div
+          className="flex items-center w-full mb-2 border border-gray-300 rounded
+         focus-within:border-gray-400 hover:border-gray-400"
+        >
+          <span
+            className={`pl-13 pr-1 text-[18px] font-semibold text-gray-700 ${
+              rawInput ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            +1
+          </span>
+          <input
+            type="text"
+            value={rawInput}
+            onFocus={() => setIsInputFocused(true)}
+            onBlur={() => setIsInputFocused(false)}
+            onChange={handleInputChange}
+            placeholder={isInputFocused ? "999-999-9999" : "Enter number"}
+            className={`flex-1 pr-4 py-2 text-[18px] font-semibold placeholder:text-lg bg-transparent
+            placeholder:font-normal placeholder:text-gray-500 focus:outline-none`}
+          />
+        </div>
 
         <div className="h-1 flex items-center justify-center pt-4">
           {callInProgress && callTimerRef.current ? (
