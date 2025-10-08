@@ -189,7 +189,8 @@ const TwilioDialler = () => {
             onChange={handleInputChange}
             placeholder={isInputFocused ? "999-999-9999" : "Enter number"}
             className={`flex-1 pr-4 py-2 text-[18px] font-semibold placeholder:text-lg bg-transparent
-            placeholder:font-normal placeholder:text-gray-500 focus:outline-none`}
+            placeholder:font-normal placeholder:text-gray-500 focus:outline-none 
+            focus:placeholder:text-[18px] focus:placeholder:text-gray-300`}
           />
         </div>
 
