@@ -5,6 +5,7 @@ import DialPad from "../dialPad/DialPad";
 import { FaPhoneAlt } from "react-icons/fa";
 import { FaBackspace } from "react-icons/fa";
 
+import { timeFormatter } from "../utils";
 import { customStyles } from "../style/reactSelectStyles";
 
 const TwilioDialler = () => {
@@ -14,6 +15,7 @@ const TwilioDialler = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
   const [fromNumber, setFromNumber] = useState("");
+  const [callDuration, setCallDuration] = useState(0);
 
   const twilioNumbers = [
     { label: "Asheboro Tree", value: "+13365230067" },
@@ -24,6 +26,7 @@ const TwilioDialler = () => {
   // Store active Call instance
   const activeCall = useRef(null);
   const clearIntervalRef = useRef(null);
+  const callTimerRef = useRef(null);
 
   // Setup Twilio Device
   useEffect(() => {
@@ -53,9 +56,13 @@ const TwilioDialler = () => {
   };
 
   // Input & DialPad handlers
-  const handleInputChange = (e) => setRawInput(e.target.value);
+  const handleInputChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, "").slice(0, 10); // keep only digits
+    setRawInput(formatNumber(digits));
+  };
   const handleDialPress = (digit) => {
-    setRawInput((prev) => (prev + digit).slice(0, 14));
+    const digits = (rawInput.replace(/\D/g, "") + digit).slice(0, 10);
+    setRawInput(formatNumber(digits));
     setErrorMessage("");
   };
   const handleDelete = () => setRawInput((prev) => prev.slice(0, -1));
@@ -89,6 +96,7 @@ const TwilioDialler = () => {
     const numberToCall = "+1" + digits;
     setStatusMessage("Calling...");
     setErrorMessage("");
+    setCallDuration(0);
 
     try {
       const newCall = await device.connect({
@@ -98,13 +106,23 @@ const TwilioDialler = () => {
       setCallInProgress(true);
 
       // Event listeners for this call
-      newCall.on("accept", () => setStatusMessage("Call Connected"));
+      newCall.on("accept", () => {
+        setStatusMessage("");
+        setCallDuration(0);
+        callTimerRef.current = setInterval(() => {
+          setCallDuration((prev) => prev + 1);
+        }, 1000);
+      });
       newCall.on("disconnect", () => {
         setCallInProgress(false);
         setStatusMessage("Call Ended");
+        if (callTimerRef.current) {
+          clearInterval(callTimerRef.current);
+          callTimerRef.current = null;
+        }
         setTimeout(() => {
           setStatusMessage("");
-        }, 3000);
+        }, 2000);
         activeCall.current = null;
       });
     } catch (err) {
@@ -143,16 +161,21 @@ const TwilioDialler = () => {
           onChange={handleInputChange}
           placeholder="Enter number"
           className="w-full mb-2 px-4 py-2 text-center border border-gray-300 
-          focus:outline-none focus:border-gray-400 hover:border-gray-400 rounded text-lg"
+          focus:outline-none focus:border-gray-400 hover:border-gray-400 
+          rounded text-[18px] font-semibold placeholder:text-lg placeholder:font-normal 
+          placeholder:text-gray-500"
         />
 
         <div className="h-1 flex items-center justify-center pt-4">
-          {statusMessage && (
+          {callInProgress && callTimerRef.current ? (
+            <p className="text-green-600 text-sm">
+              {timeFormatter(callDuration)}
+            </p>
+          ) : statusMessage ? (
             <p className="text-green-600 text-sm">{statusMessage}</p>
-          )}
-          {errorMessage && (
+          ) : errorMessage ? (
             <p className="text-red-500 text-sm">{errorMessage}</p>
-          )}
+          ) : null}
         </div>
 
         <DialPad onPress={handleDialPress} onDelete={handleDelete} />
