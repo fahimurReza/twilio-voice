@@ -18,6 +18,7 @@ const TwiloDialler = () => {
   const twilioNumbers = [
     { label: "Asheboro Tree", value: "+13365230067" },
     { label: "Plano Concrete", value: "+14694094540" },
+    { label: "Texarkana Tree", value: "+18706002037" },
   ];
 
   // Store active Call instance
@@ -57,11 +58,7 @@ const TwiloDialler = () => {
     setErrorMessage("");
   };
   const handleDelete = () => setRawInput((prev) => prev.slice(0, -1));
-  const handleClear = () => {
-    setRawInput("");
-    setErrorMessage("");
-    setStatusMessage("");
-  };
+  const handleClear = () => setRawInput((prev) => prev.slice(0, -1));
 
   // --- Single toggle button ---
   const handleCall = async () => {
@@ -125,7 +122,7 @@ const TwiloDialler = () => {
   const isCallDisabled = !device || rawInput.trim().length === 0;
 
   return (
-    <div className="flex justify-center items-center h-screen">
+    <div className="flex justify-center items-center mt-6">
       <div
         className="flex flex-col justify-center items-center rounded-xl shadow-2xl 
         px-6 pt-7 pb-8 w-80 bg-white"
@@ -180,7 +177,7 @@ const TwiloDialler = () => {
           {/* Clear Button */}
           <button
             onClick={handleClear}
-            className={`absolute right-4 transition-opacity duration-300 ${
+            className={`absolute right-8 transition-opacity duration-300 ${
               rawInput
                 ? "opacity-100 pointer-events-auto"
                 : "opacity-0 pointer-events-none"

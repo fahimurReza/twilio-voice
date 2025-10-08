@@ -47,6 +47,8 @@ const DialPad = ({ onPress, onDelete }) => {
         setLongPressTriggered(true);
       }, 500);
       setLongPressTimer(timer);
+    } else {
+      onPress(btn);
     }
   };
 
@@ -58,21 +60,17 @@ const DialPad = ({ onPress, onDelete }) => {
     }
   };
 
-  const handleClick = (btn) => {
-    if (btn !== "0") onPress(btn);
-  };
-
   return (
-    <div className="grid grid-cols-3 gap-6 mt-8 mb-4">
+    <div className="grid grid-cols-3 gap-x-7 gap-y-5 mt-8 mb-4">
       {buttons.map(({ digit, letters }) => (
         <button
           key={digit}
-          onMouseDown={() => handlePressStart(digit)}
-          onMouseUp={() => handlePressEnd(digit)}
-          onTouchStart={() => handlePressStart(digit)}
-          onTouchEnd={() => handlePressEnd(digit)}
-          onClick={() => handleClick(digit)}
-          className="w-16 h-16 flex flex-col justify-center items-center bg-gray-200 rounded-full hover:bg-gray-300 transition shadow-sm"
+          onPointerDown={() => handlePressStart(digit)}
+          onPointerUp={() => handlePressEnd(digit)}
+          className={`w-13 h-13 flex flex-col justify-center items-center bg-gray-100 
+          rounded-full hover:bg-gray-200 transition shadow-sm font-semibold ${
+            digit === "1" ? "pb-[16px]" : ""
+          }`}
         >
           <span className="text-xl font-semibold leading-none">{digit}</span>
           {letters && (
