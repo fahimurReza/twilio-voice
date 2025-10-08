@@ -23,6 +23,7 @@ const TwilioDialler = () => {
 
   // Store active Call instance
   const activeCall = useRef(null);
+  const clearIntervalRef = useRef(null);
 
   // Setup Twilio Device
   useEffect(() => {
@@ -58,7 +59,15 @@ const TwilioDialler = () => {
     setErrorMessage("");
   };
   const handleDelete = () => setRawInput((prev) => prev.slice(0, -1));
-  const handleClear = () => setRawInput((prev) => prev.slice(0, -1));
+  const handleClearPressStart = () => {
+    clearIntervalRef.current = setInterval(() => {
+      setRawInput((prev) => prev.slice(0, -1));
+    }, 150); // 150ms between deletions
+  };
+  const handleClearPressEnd = () => {
+    clearInterval(clearIntervalRef.current);
+    clearIntervalRef.current = null;
+  };
 
   // --- Single toggle button ---
   const handleCall = async () => {
@@ -176,7 +185,9 @@ const TwilioDialler = () => {
 
           {/* Clear Button */}
           <button
-            onClick={handleClear}
+            onPointerDown={handleClearPressStart}
+            onPointerUp={handleClearPressEnd}
+            onPointerLeave={handleClearPressEnd}
             className={`absolute right-8 transition-opacity duration-300 ${
               rawInput
                 ? "opacity-100 pointer-events-auto"
