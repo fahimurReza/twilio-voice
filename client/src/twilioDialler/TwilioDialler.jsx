@@ -17,6 +17,7 @@ const TwilioDialler = () => {
   const [fromNumber, setFromNumber] = useState("");
   const [callDuration, setCallDuration] = useState(0);
   const [isInputFocused, setIsInputFocused] = useState(false);
+  const [isSelectError, setIsSelectError] = useState(false);
 
   const twilioNumbers = [
     { label: "Asheboro Tree", value: "+13365230067" },
@@ -93,6 +94,15 @@ const TwilioDialler = () => {
 
   // --- Single toggle button ---
   const handleCall = async () => {
+    if (!fromNumber) {
+      setIsSelectError(true);
+      setErrorMessage("Please Select a Business");
+      setTimeout(() => {
+        setIsSelectError(false);
+        setErrorMessage("");
+      }, 1000);
+      return;
+    }
     if (!device) return;
 
     // If there’s an active call → hang up
@@ -149,8 +159,6 @@ const TwilioDialler = () => {
     }
   };
 
-  const isCallDisabled = !device || rawInput.trim().length === 0;
-
   return (
     <div className="flex justify-center items-center mt-6">
       <div
@@ -160,12 +168,14 @@ const TwilioDialler = () => {
         <div className="w-full mb-2">
           <Select
             value={twilioNumbers.find((bus) => bus.value === fromNumber)}
-            onChange={(selected) =>
-              setFromNumber(selected ? selected.value : "")
-            }
+            onChange={(selected) => {
+              setFromNumber(selected ? selected.value : "");
+              setIsSelectError(false);
+              setErrorMessage("");
+            }}
             options={twilioNumbers}
             placeholder="Select Business"
-            styles={customStyles}
+            styles={customStyles(isSelectError)}
             isSearchable={false}
           />
         </div>
@@ -202,7 +212,7 @@ const TwilioDialler = () => {
           ) : statusMessage ? (
             <p className="text-green-600 text-sm">{statusMessage}</p>
           ) : errorMessage ? (
-            <p className="text-red-500 text-sm">{errorMessage}</p>
+            <p className="text-red-500 text-base">{errorMessage}</p>
           ) : null}
         </div>
 
@@ -212,7 +222,6 @@ const TwilioDialler = () => {
           {/* Call Button */}
           <button
             onClick={handleCall}
-            disabled={isCallDisabled}
             className={`px-4 py-4 rounded-full transition ${
               callInProgress ? "bg-red-500" : "bg-blue-600 hover:bg-blue-800"
             }`}
