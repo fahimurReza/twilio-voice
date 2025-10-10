@@ -5,3 +5,19 @@ export const timeFormatter = (seconds) => {
   const secs = (seconds % 60).toString().padStart(2, "0");
   return `${mins}:${secs}`;
 };
+
+export const currentTime = () => {
+  new Date().toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
+export const currentDate = () => {
+  new Date().toLocaleDateString("en-US", {
+    month: "2-digit",
+    day: "2-digit",
+    year: "2-digit",
+  });
+};

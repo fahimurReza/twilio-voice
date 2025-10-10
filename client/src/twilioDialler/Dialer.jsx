@@ -1,11 +1,12 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useDispatch } from "react-redux";
 import { Device } from "@twilio/voice-sdk";
 import Select from "react-select";
-import DialPad from "./DialPad";
 import { FaPhoneAlt } from "react-icons/fa";
 import { FaBackspace } from "react-icons/fa";
-
-import { timeFormatter } from "../utils";
+import DialPad from "./DialPad";
+import { addCall } from "../store/store";
+import { timeFormatter, currentTime, currentDate } from "../utils";
 import { customStyles } from "../style/reactSelectStyles";
 
 function Dialer() {
@@ -18,6 +19,8 @@ function Dialer() {
   const [callDuration, setCallDuration] = useState(0);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isSelectError, setIsSelectError] = useState(false);
+
+  const dispatch = useDispatch();
 
   const twilioNumbers = [
     { label: "Asheboro Tree", value: "+13365230067" },
@@ -134,6 +137,7 @@ function Dialer() {
           setCallDuration((prev) => prev + 1);
         }, 1000);
       });
+
       newCall.on("disconnect", () => {
         setCallInProgress(false);
         setStatusMessage("Call Ended");
@@ -142,6 +146,15 @@ function Dialer() {
           clearInterval(callTimerRef.current);
           callTimerRef.current = null;
         }
+        dispatch(
+          addCall({
+            phoneNumber: formatNumber(digits),
+            business: twilioNumbers.find((bus) => bus.value === fromNumber)
+              ?.label,
+            time: currentTime,
+            date: currentDate,
+          })
+        );
         setTimeout(() => {
           setStatusMessage("");
         }, 4000);
