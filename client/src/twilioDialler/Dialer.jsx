@@ -4,6 +4,7 @@ import { addCall, setCallInput } from "../store/store";
 import { Device } from "@twilio/voice-sdk";
 import Select from "react-select";
 import DialPad from "./DialPad";
+import AddBusiness from "./AddBusiness";
 import { FaPhoneAlt } from "react-icons/fa";
 import { FaBackspace } from "react-icons/fa";
 import { customStyles } from "../style/reactSelectStyles";
@@ -31,7 +32,6 @@ function Dialer() {
 
   const dispatch = useDispatch();
   const activeCall = useRef(null);
-  const clearIntervalRef = useRef(null);
   const callTimerRef = useRef(null);
 
   const {
@@ -226,8 +226,8 @@ function Dialer() {
 
   return (
     <div className="flex flex-col justify-center items-center w-1/2 py-7">
-      <div id="inputBox" className="w-60">
-        <div className="w-full mb-2">
+      <div className="flex w-full justify-center">
+        <div className="w-58 mb-2 ml-8">
           <Select
             value={selectValue()}
             onChange={(selected) => handleSelectChange(selected)}
@@ -237,27 +237,28 @@ function Dialer() {
             isSearchable={true}
           />
         </div>
-        <div className="flex items-center mb-2 rounded focus-within:border-gray-400 hover:border-gray-400">
-          <span
-            className={`pl-9 pr-1 text-[18px] font-semibold text-gray-700 ${
-              rawInput ? "opacity-100 pl-11" : "opacity-0"
-            }`}
-          >
-            +1
-          </span>
-          <input
-            type="text"
-            value={rawInput || ""}
-            onFocus={() => setIsInputFocused(true)}
-            onBlur={() => setIsInputFocused(false)}
-            onChange={handleInputChange}
-            onKeyDown={(e) => handleInputEnter(e)}
-            placeholder={isInputFocused ? "999-999-9999" : "Enter a number"}
-            className={`flex-1 pr-4 py-2 text-[18px] font-semibold placeholder:text-lg bg-transparent
+        <AddBusiness />
+      </div>
+      <div className="flex items-center w-60 mb-2 rounded focus-within:border-gray-400 hover:border-gray-400">
+        <span
+          className={`pl-9 pr-1 text-[18px] font-semibold text-gray-700 ${
+            rawInput ? "opacity-100 pl-11" : "opacity-0"
+          }`}
+        >
+          +1
+        </span>
+        <input
+          type="text"
+          value={rawInput || ""}
+          onFocus={() => setIsInputFocused(true)}
+          onBlur={() => setIsInputFocused(false)}
+          onChange={handleInputChange}
+          onKeyDown={(e) => handleInputEnter(e)}
+          placeholder={isInputFocused ? "999-999-9999" : "Enter a number"}
+          className={`flex-1 pr-4 py-2 text-[18px] font-semibold placeholder:text-lg bg-transparent
             placeholder:font-normal placeholder:text-gray-500 focus:outline-none 
             focus:placeholder:text-[18px] focus:placeholder:text-gray-300`}
-          />
-        </div>
+        />
       </div>
 
       <div className="h-1 flex items-center justify-center mb-2">
