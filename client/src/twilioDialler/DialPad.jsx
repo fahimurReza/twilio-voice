@@ -67,8 +67,8 @@ const DialPad = ({ onPress, onDelete }) => {
           key={digit}
           onPointerDown={() => handlePressStart(digit)}
           onPointerUp={() => handlePressEnd(digit)}
-          className={`w-13 h-13 flex flex-col justify-center items-center bg-gray-100 
-          rounded-full hover:bg-gray-200 transition shadow-sm font-semibold ${
+          className={`w-13 h-13 flex flex-col justify-center items-center bg-blue-50 
+          rounded-full hover:bg-blue-100 transition shadow-sm font-semibold ${
             digit === "1" ? "pb-[16px]" : ""
           }`}
         >

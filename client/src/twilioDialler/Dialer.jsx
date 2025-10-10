@@ -1,26 +1,30 @@
-import { useEffect, useState, useRef } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState, useRef } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addCall, setCallInput } from "../store/store";
 import { Device } from "@twilio/voice-sdk";
 import Select from "react-select";
+import DialPad from "./DialPad";
 import { FaPhoneAlt } from "react-icons/fa";
 import { FaBackspace } from "react-icons/fa";
-import DialPad from "./DialPad";
-import { addCall } from "../store/store";
-import { timeFormatter, currentDate, currentTime } from "../utils";
+import { timeFormatter, currentTime, currentDate } from "../utils";
 import { customStyles } from "../style/reactSelectStyles";
 
 function Dialer() {
+  const dispatch = useDispatch();
+  const {
+    rawInput = "",
+    fromNumber = "",
+    startCall,
+  } = useSelector((state) => {
+    return state.calls || { rawInput: "", fromNumber: "", startCall: false };
+  });
   const [device, setDevice] = useState(null);
   const [callInProgress, setCallInProgress] = useState(false);
-  const [rawInput, setRawInput] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
-  const [fromNumber, setFromNumber] = useState("");
   const [callDuration, setCallDuration] = useState(0);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isSelectError, setIsSelectError] = useState(false);
-
-  const dispatch = useDispatch();
 
   const twilioNumbers = [
     { label: "Asheboro Tree", value: "+13365230067" },
@@ -28,7 +32,6 @@ function Dialer() {
     { label: "Texarkana Tree", value: "+18706002037" },
   ];
 
-  // Store active Call instance
   const activeCall = useRef(null);
   const clearIntervalRef = useRef(null);
   const callTimerRef = useRef(null);
@@ -48,6 +51,16 @@ function Dialer() {
       })
       .catch((err) => console.error(err));
   }, [fromNumber]);
+
+  // CHANGE: Add useEffect to auto-trigger handleCall on startCall flag
+  useEffect(() => {
+    if (startCall && device && fromNumber && rawInput) {
+      handleCall();
+      dispatch(
+        setCallInput({ phoneNumber: rawInput, fromNumber, startCall: false })
+      );
+    }
+  }, [startCall, device, fromNumber, rawInput, dispatch]);
 
   // Format digits as (XXX) XXX-XXXX
   const formatNumber = (digits) => {
@@ -69,25 +82,46 @@ function Dialer() {
     } else {
       phoneDigits = allDigits.slice(0, 10);
     }
-    setRawInput(formatNumber(phoneDigits));
+    dispatch(
+      setCallInput({
+        phoneNumber: formatNumber(phoneDigits),
+        fromNumber,
+        startCall: false,
+      })
+    );
   };
   const handleDialPress = (digit) => {
     const currentDigits = rawInput.replace(/\D/g, "");
     const newDigits = (currentDigits + digit).slice(0, 10);
-    setRawInput(formatNumber(newDigits));
+    dispatch(
+      setCallInput({
+        phoneNumber: formatNumber(newDigits),
+        fromNumber,
+        startCall: false,
+      })
+    );
     setErrorMessage("");
   };
   const handleDelete = () => {
     const currentDigits = rawInput.replace(/\D/g, "");
     const newDigits = currentDigits.slice(0, -1);
-    setRawInput(formatNumber(newDigits));
+    dispatch(
+      setCallInput({
+        phoneNumber: formatNumber(newDigits),
+        fromNumber,
+        startCall: false,
+      })
+    );
   };
   const handleClearPressStart = () => {
     clearIntervalRef.current = setInterval(() => {
-      setRawInput((prev) => {
-        const currentDigits = prev.replace(/\D/g, "");
-        return formatNumber(currentDigits.slice(0, -1));
-      });
+      dispatch(
+        setCallInput({
+          phoneNumber: formatNumber(rawInput.replace(/\D/g, "").slice(0, -1)),
+          fromNumber,
+          startCall: false,
+        })
+      );
     }, 150);
   };
   const handleClearPressEnd = () => {
@@ -95,7 +129,6 @@ function Dialer() {
     clearIntervalRef.current = null;
   };
 
-  // --- Single toggle button ---
   const handleCall = async () => {
     if (!fromNumber) {
       setIsSelectError(true);
@@ -104,7 +137,6 @@ function Dialer() {
     }
     if (!device) return;
 
-    // If there’s an active call → hang up
     if (callInProgress && activeCall.current) {
       activeCall.current.disconnect();
       setCallInProgress(false);
@@ -113,9 +145,14 @@ function Dialer() {
       return;
     }
 
-    // Otherwise, start a new call
     const digits = rawInput.replace(/\D/g, "");
-    setRawInput(formatNumber(digits));
+    dispatch(
+      setCallInput({
+        phoneNumber: formatNumber(digits),
+        fromNumber,
+        startCall: false,
+      })
+    );
 
     const numberToCall = "+1" + digits;
     setStatusMessage("Calling...");
@@ -129,7 +166,6 @@ function Dialer() {
       activeCall.current = newCall;
       setCallInProgress(true);
 
-      // Event listeners for this call
       newCall.on("accept", () => {
         setStatusMessage("");
         setCallDuration(0);
@@ -137,11 +173,12 @@ function Dialer() {
           setCallDuration((prev) => prev + 1);
         }, 1000);
       });
-
       newCall.on("disconnect", () => {
         setCallInProgress(false);
         setStatusMessage("Call Ended");
-        setFromNumber("");
+        dispatch(
+          setCallInput({ phoneNumber: "", fromNumber: "", startCall: false })
+        );
         if (callTimerRef.current) {
           clearInterval(callTimerRef.current);
           callTimerRef.current = null;
@@ -149,10 +186,12 @@ function Dialer() {
         dispatch(
           addCall({
             phoneNumber: formatNumber(digits),
-            business: twilioNumbers.find((bus) => bus.value === fromNumber)
-              ?.label,
+            business:
+              twilioNumbers.find((bus) => bus.value === fromNumber)?.label ||
+              "",
             time: currentTime(),
             date: currentDate(),
+            duration: timeFormatter(callDuration),
           })
         );
         setTimeout(() => {
@@ -168,6 +207,7 @@ function Dialer() {
       activeCall.current = null;
     }
   };
+
   return (
     <div className="flex flex-col justify-center items-center w-1/2 py-8">
       <div id="inputBox" className="w-60">
@@ -179,7 +219,13 @@ function Dialer() {
                 : null
             }
             onChange={(selected) => {
-              setFromNumber(selected ? selected.value : "");
+              dispatch(
+                setCallInput({
+                  phoneNumber: rawInput,
+                  fromNumber: selected ? selected.value : "",
+                  startCall: false,
+                })
+              );
               setIsSelectError(false);
               setErrorMessage("");
             }}
@@ -189,10 +235,7 @@ function Dialer() {
             isSearchable={false}
           />
         </div>
-        <div
-          className="flex items-center mb-2  rounded
-         focus-within:border-gray-400 hover:border-gray-400"
-        >
+        <div className="flex items-center mb-2 rounded focus-within:border-gray-400 hover:border-gray-400">
           <span
             className={`pl-9 pr-1 text-[18px] font-semibold text-gray-700 ${
               rawInput ? "opacity-100 pl-11" : "opacity-0"
@@ -202,7 +245,7 @@ function Dialer() {
           </span>
           <input
             type="text"
-            value={rawInput}
+            value={rawInput || ""}
             onFocus={() => setIsInputFocused(true)}
             onBlur={() => setIsInputFocused(false)}
             onChange={handleInputChange}
@@ -232,7 +275,6 @@ function Dialer() {
       <DialPad onPress={handleDialPress} onDelete={handleDelete} />
 
       <div className="relative flex justify-center items-center w-full mt-4">
-        {/* Call Button */}
         <button
           onClick={handleCall}
           className={`px-4 py-4 rounded-full transition ${
@@ -246,12 +288,11 @@ function Dialer() {
           />
         </button>
 
-        {/* Clear Button */}
         <button
           onPointerDown={handleClearPressStart}
           onPointerUp={handleClearPressEnd}
           onPointerLeave={handleClearPressEnd}
-          className={`absolute right-8 transition-opacity duration-300 ${
+          className={`absolute right-16 transition-opacity duration-300 ${
             rawInput
               ? "opacity-100 pointer-events-auto"
               : "opacity-0 pointer-events-none"

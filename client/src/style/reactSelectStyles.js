@@ -49,7 +49,7 @@ export const customStyles = (isSelectError) => ({
     color: "#6b7280", // gray-500
     textAlign: "center",
     cursor: "pointer",
-    fontSize: ".9rem",
+    fontSize: "1rem",
     padding: "10px 0",
   }),
 });

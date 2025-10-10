@@ -9,7 +9,7 @@ function CallHistory() {
       <Header />
       <div className="h-max-[520px] overflow-y-auto">
         {callHistory.map((call, index) => (
-          <HistoryCard key={index} call={call} />
+          <HistoryCard key={index} call={call} index={index} />
         ))}
       </div>
     </div>
