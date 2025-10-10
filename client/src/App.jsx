@@ -3,7 +3,7 @@ import TwilioDialler from "./twilioDialler/TwilioDialler";
 
 const App = () => {
   return (
-    <div>
+    <div className="flex justify-center items-center min-h-screen">
       <TwilioDialler />
     </div>
   );

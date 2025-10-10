@@ -22,6 +22,7 @@ export const customStyles = (isSelectError) => ({
     fontWeight: "400",
     color: "#6b7280", // gray-500
     transition: "border-color 0.2s ease",
+    minHeight: "30px",
   }),
   placeholder: (provided) => ({
     ...provided,
