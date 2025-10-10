@@ -6,18 +6,15 @@ import Select from "react-select";
 import DialPad from "./DialPad";
 import { FaPhoneAlt } from "react-icons/fa";
 import { FaBackspace } from "react-icons/fa";
-import { timeFormatter, currentTime, currentDate } from "../utils";
 import { customStyles } from "../style/reactSelectStyles";
+import {
+  timeFormatter,
+  currentTime,
+  currentDate,
+  formatNumber,
+} from "../utils";
 
 function Dialer() {
-  const dispatch = useDispatch();
-  const {
-    rawInput = "",
-    fromNumber = "",
-    startCall,
-  } = useSelector((state) => {
-    return state.calls || { rawInput: "", fromNumber: "", startCall: false };
-  });
   const [device, setDevice] = useState(null);
   const [callInProgress, setCallInProgress] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -32,9 +29,18 @@ function Dialer() {
     { label: "Texarkana Tree", value: "+18706002037" },
   ];
 
+  const dispatch = useDispatch();
   const activeCall = useRef(null);
   const clearIntervalRef = useRef(null);
   const callTimerRef = useRef(null);
+
+  const {
+    rawInput = "",
+    fromNumber = "",
+    startCall,
+  } = useSelector((state) => {
+    return state.calls || { rawInput: "", fromNumber: "", startCall: false };
+  });
 
   // Setup Twilio Device
   useEffect(() => {
@@ -52,26 +58,16 @@ function Dialer() {
       .catch((err) => console.error(err));
   }, [fromNumber]);
 
-  // CHANGE: Add useEffect to auto-trigger handleCall on startCall flag
+  // useEffect to auto-trigger handleCall on startCall flag
   useEffect(() => {
     if (startCall && device && fromNumber && rawInput) {
+      setIsSelectError(false);
       handleCall();
       dispatch(
         setCallInput({ phoneNumber: rawInput, fromNumber, startCall: false })
       );
     }
   }, [startCall, device, fromNumber, rawInput, dispatch]);
-
-  // Format digits as (XXX) XXX-XXXX
-  const formatNumber = (digits) => {
-    if (!digits) return "";
-    const area = digits.slice(0, 3);
-    const part1 = digits.slice(3, 6);
-    const part2 = digits.slice(6, 10);
-    if (digits.length <= 3) return `(${area}`;
-    if (digits.length <= 6) return `(${area}) ${part1}`;
-    return `(${area}) ${part1}-${part2}`;
-  };
 
   // Input & DialPad handlers
   const handleInputChange = (e) => {
@@ -90,6 +86,11 @@ function Dialer() {
       })
     );
   };
+
+  const handleInputEnter = (e) => {
+    e.key === "Enter" && handleCall();
+  };
+
   const handleDialPress = (digit) => {
     const currentDigits = rawInput.replace(/\D/g, "");
     const newDigits = (currentDigits + digit).slice(0, 10);
@@ -102,6 +103,7 @@ function Dialer() {
     );
     setErrorMessage("");
   };
+
   const handleDelete = () => {
     const currentDigits = rawInput.replace(/\D/g, "");
     const newDigits = currentDigits.slice(0, -1);
@@ -113,20 +115,23 @@ function Dialer() {
       })
     );
   };
-  const handleClearPressStart = () => {
-    clearIntervalRef.current = setInterval(() => {
-      dispatch(
-        setCallInput({
-          phoneNumber: formatNumber(rawInput.replace(/\D/g, "").slice(0, -1)),
-          fromNumber,
-          startCall: false,
-        })
-      );
-    }, 150);
+
+  const handleSelectChange = (selected) => {
+    dispatch(
+      setCallInput({
+        phoneNumber: rawInput,
+        fromNumber: selected ? selected.value : "",
+        startCall: false,
+      })
+    );
+    setIsSelectError(false);
+    setErrorMessage("");
   };
-  const handleClearPressEnd = () => {
-    clearInterval(clearIntervalRef.current);
-    clearIntervalRef.current = null;
+
+  const selectValue = () => {
+    return fromNumber
+      ? twilioNumbers.find((bus) => bus.value === fromNumber)
+      : null;
   };
 
   const handleCall = async () => {
@@ -135,7 +140,18 @@ function Dialer() {
       setErrorMessage("Please Select a Business");
       return;
     }
-    if (!device) return;
+    if (!device) {
+      setErrorMessage("Connect the Server");
+      return;
+    }
+    if (!rawInput) {
+      setErrorMessage("Please Enter a Number");
+      return;
+    }
+    if (rawInput.length < 14) {
+      setErrorMessage("Invalid Number");
+      return;
+    }
 
     if (callInProgress && activeCall.current) {
       activeCall.current.disconnect();
@@ -209,30 +225,16 @@ function Dialer() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center w-1/2 py-8">
+    <div className="flex flex-col justify-center items-center w-1/2 py-7">
       <div id="inputBox" className="w-60">
         <div className="w-full mb-2">
           <Select
-            value={
-              fromNumber
-                ? twilioNumbers.find((bus) => bus.value === fromNumber)
-                : null
-            }
-            onChange={(selected) => {
-              dispatch(
-                setCallInput({
-                  phoneNumber: rawInput,
-                  fromNumber: selected ? selected.value : "",
-                  startCall: false,
-                })
-              );
-              setIsSelectError(false);
-              setErrorMessage("");
-            }}
+            value={selectValue()}
+            onChange={(selected) => handleSelectChange(selected)}
             options={twilioNumbers}
             placeholder="Select a Business"
             styles={customStyles(isSelectError)}
-            isSearchable={false}
+            isSearchable={true}
           />
         </div>
         <div className="flex items-center mb-2 rounded focus-within:border-gray-400 hover:border-gray-400">
@@ -249,9 +251,7 @@ function Dialer() {
             onFocus={() => setIsInputFocused(true)}
             onBlur={() => setIsInputFocused(false)}
             onChange={handleInputChange}
-            onKeyDown={(e) => {
-              e.key === "Enter" && handleCall();
-            }}
+            onKeyDown={(e) => handleInputEnter(e)}
             placeholder={isInputFocused ? "999-999-9999" : "Enter a number"}
             className={`flex-1 pr-4 py-2 text-[18px] font-semibold placeholder:text-lg bg-transparent
             placeholder:font-normal placeholder:text-gray-500 focus:outline-none 
@@ -289,9 +289,7 @@ function Dialer() {
         </button>
 
         <button
-          onPointerDown={handleClearPressStart}
-          onPointerUp={handleClearPressEnd}
-          onPointerLeave={handleClearPressEnd}
+          onClick={handleDelete}
           className={`absolute right-16 transition-opacity duration-300 ${
             rawInput
               ? "opacity-100 pointer-events-auto"

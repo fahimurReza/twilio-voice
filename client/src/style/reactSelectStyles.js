@@ -52,4 +52,18 @@ export const customStyles = (isSelectError) => ({
     fontSize: "1rem",
     padding: "10px 0",
   }),
+  // CHANGE: Add styles for down arrow
+  dropdownIndicator: (provided, state) => ({
+    ...provided,
+    color: isSelectError ? "#ef4444" : state.hasValue ? "#3b82f6" : "#60a5fa",
+  }),
+  // CHANGE: Add styles for divider
+  indicatorSeparator: (provided, state) => ({
+    ...provided,
+    backgroundColor: isSelectError
+      ? "#ef4444"
+      : state.hasValue
+      ? "#3b82f6"
+      : "#60a5fa",
+  }),
 });
