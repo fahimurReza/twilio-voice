@@ -6,7 +6,7 @@ import { FaPhoneAlt } from "react-icons/fa";
 import { FaBackspace } from "react-icons/fa";
 import DialPad from "./DialPad";
 import { addCall } from "../store/store";
-import { timeFormatter, currentTime, currentDate } from "../utils";
+import { timeFormatter, currentDate, currentTime } from "../utils";
 import { customStyles } from "../style/reactSelectStyles";
 
 function Dialer() {
@@ -151,8 +151,8 @@ function Dialer() {
             phoneNumber: formatNumber(digits),
             business: twilioNumbers.find((bus) => bus.value === fromNumber)
               ?.label,
-            time: currentTime,
-            date: currentDate,
+            time: currentTime(),
+            date: currentDate(),
           })
         );
         setTimeout(() => {
