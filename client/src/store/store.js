@@ -33,7 +33,6 @@ const callSlice = createSlice({
         console.error("removeCall: Index is undefined");
         return;
       }
-      console.log("Removing call at index:", action.payload);
       state.callHistory = state.callHistory.filter(
         (_, index) => index !== action.payload
       );

@@ -5,17 +5,17 @@ export const customStyles = (isSelectError) => ({
     backgroundColor: isSelectError
       ? "#fef2f2" // red-50
       : state.hasValue
-      ? "#f0fdf4" // green-50
+      ? "#eff6ff" // blue-50
       : "white",
     borderColor: isSelectError
       ? "#f87171" //red-400
       : state.hasValue
-      ? "#4ade80" // green-400
+      ? "#60a5fa" // blue-400
       : state.isFocused
-      ? "#9ca3af" // gray-400
-      : "#d1d5db", // gray-300
+      ? "#3b82f6" // blue-600
+      : "#bfdbfe", // blue-300
     boxShadow: "none",
-    "&:hover": { borderColor: "#a1a1aa" },
+    "&:hover": { borderColor: "#3b82f6" },
     borderRadius: "0.25rem", // rounded
     minHeight: "44px",
     fontSize: "1.1rem", // text-base
@@ -45,7 +45,7 @@ export const customStyles = (isSelectError) => ({
   }),
   option: (provided, state) => ({
     ...provided,
-    backgroundColor: state.isFocused ? "#f3f4f6" : "white", // gray-100 hover
+    backgroundColor: state.isFocused ? "#eff6ff" : "white", // blue-50 hover
     color: "#6b7280", // gray-500
     textAlign: "center",
     cursor: "pointer",
