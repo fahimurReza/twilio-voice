@@ -9,7 +9,7 @@ function BusinessSelect({
 }) {
   return (
     <div className="flex w-full justify-center">
-      <div className="w-58 ml-8">
+      <div className="w-58 ml-[38px]">
         <Select
           value={selectValue()}
           onChange={(selected) => handleSelectChange(selected)}

@@ -1,14 +1,16 @@
-import React from "react";
 import { useSelector } from "react-redux";
 import HistoryCard from "./HistoryCard";
-import Header from "./Header";
+import CustomHeader from "./CustomHeader";
 
 function CallHistory() {
   const callHistory = useSelector((state) => state.calls.callHistory);
   return (
     <div className="w-1/2 flex flex-col">
-      <Header />
-      <div className="max-h-[520px] overflow-y-auto">
+      <CustomHeader
+        headline={"Call History"}
+        className="rounded-tl-lg h-[160px]"
+      />
+      <div className="overflow-y-auto mt-[-10px]">
         {Array.isArray(callHistory) && callHistory.length > 0 ? (
           [...callHistory]
             .reverse()

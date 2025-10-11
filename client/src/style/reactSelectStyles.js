@@ -7,15 +7,14 @@ export const customStyles = (isSelectError) => ({
       : state.hasValue
       ? "#eff6ff" // blue-50
       : "white",
-    borderColor: isSelectError
-      ? "#f87171" //red-400
-      : state.hasValue
-      ? "#60a5fa" // blue-400
-      : state.isFocused
-      ? "#3b82f6" // blue-600
-      : "#bfdbfe", // blue-300
+    borderColor: isSelectError ? "#f87171" : "#60a5fa", // red-400/blue-400
+    outline: state.isFocused
+      ? isSelectError
+        ? "1px solid #f87171" // red-400
+        : "1px solid #60a5fa" // blue-400
+      : "none",
     boxShadow: "none",
-    "&:hover": { borderColor: "#3b82f6" },
+    "&:hover": { borderColor: isSelectError ? "#f87171" : "#60a5fa" },
     borderRadius: "0.25rem", // rounded
     minHeight: "44px",
     fontSize: "1.1rem", // text-base

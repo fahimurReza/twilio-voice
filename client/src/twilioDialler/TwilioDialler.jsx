@@ -4,7 +4,7 @@ import CallHistory from "./CallHistory";
 const TwilioDialler = () => {
   return (
     <div
-      className="flex justify-center content-center mt-6 rounded-xl 
+      className="flex justify-center content-center mt-6 rounded-lg
       shadow-2xl w-180 max-h-[560px]"
     >
       <CallHistory />

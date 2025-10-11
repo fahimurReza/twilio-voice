@@ -145,7 +145,7 @@ function Dialer() {
       return;
     }
     if (!device) {
-      setErrorMessage("Connect the Server");
+      setErrorMessage("Please Connect the Server");
       return;
     }
     if (!rawInput) {
@@ -229,11 +229,11 @@ function Dialer() {
   };
 
   return (
-    <div className="w-1/2 py-7">
+    <div className="w-1/2">
       {isAddBusinessOn ? (
         <AddBusiness onClose={() => setAddBusinessOn(false)} />
       ) : (
-        <div className="flex flex-col justify-center items-center">
+        <div className="flex flex-col justify-center items-center py-7">
           <div className="flex justify-center items-center mb-2">
             <BusinessSelect
               selectValue={selectValue}
@@ -250,6 +250,9 @@ function Dialer() {
             setIsInputFocused={setIsInputFocused}
             handleInputChange={handleInputChange}
             handleInputEnter={handleInputEnter}
+            setOnFocus={() => setIsInputFocused(true)}
+            setOnBlur={() => setIsInputFocused(false)}
+            inputClassName="focus:outline-none"
           />
           <ErrorAndStatus
             callInProgress={callInProgress}

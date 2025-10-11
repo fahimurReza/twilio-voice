@@ -1,5 +1,4 @@
-import React from "react";
-import { FaPhoneAlt } from "react-icons/fa";
+import { FaPhoneFlip } from "react-icons/fa6";
 
 function MakeCallButton({ handleCall, callInProgress }) {
   return (
@@ -9,8 +8,8 @@ function MakeCallButton({ handleCall, callInProgress }) {
         callInProgress ? "bg-red-500" : "bg-blue-600 hover:bg-blue-700"
       }`}
     >
-      <FaPhoneAlt
-        size={25}
+      <FaPhoneFlip
+        size={26}
         color="white"
         className={callInProgress ? "rotate-135" : ""}
       />
