@@ -1,13 +1,16 @@
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addCall, setCallInput } from "../store/store";
 import { Device } from "@twilio/voice-sdk";
-import Select from "react-select";
 import DialPad from "./DialPad";
 import AddBusiness from "./AddBusiness";
-import { FaPhoneAlt } from "react-icons/fa";
-import { FaBackspace } from "react-icons/fa";
-import { customStyles } from "../style/reactSelectStyles";
+import NumberInput from "./NumberInput";
+import BusinessSelect from "./BusinessSelect";
+import ErrorAndStatus from "./ErrorAndStatus";
+import MakeCallButton from "./MakeCallButton";
+import DeleteButton from "./DeleteButton";
+import AddBusinessButton from "./AddBusinessButton";
+
 import {
   timeFormatter,
   currentTime,
@@ -23,6 +26,7 @@ function Dialer() {
   const [callDuration, setCallDuration] = useState(0);
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isSelectError, setIsSelectError] = useState(false);
+  const [isAddBusinessOn, setAddBusinessOn] = useState(false);
 
   const twilioNumbers = [
     { label: "Asheboro Tree", value: "+13365230067" },
@@ -225,81 +229,46 @@ function Dialer() {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center w-1/2 py-7">
-      <div className="flex w-full justify-center">
-        <div className="w-58 mb-2 ml-8">
-          <Select
-            value={selectValue()}
-            onChange={(selected) => handleSelectChange(selected)}
-            options={twilioNumbers}
-            placeholder="Select a Business"
-            styles={customStyles(isSelectError)}
-            isSearchable={true}
+    <div className="w-1/2 py-7">
+      {isAddBusinessOn ? (
+        <AddBusiness onClose={() => setAddBusinessOn(false)} />
+      ) : (
+        <div className="flex flex-col justify-center items-center">
+          <div className="flex justify-center items-center mb-2">
+            <BusinessSelect
+              selectValue={selectValue}
+              handleSelectChange={handleSelectChange}
+              twilioNumbers={twilioNumbers}
+              isSelectError={isSelectError}
+              setAddBusinessOn={setAddBusinessOn}
+            />
+            <AddBusinessButton setAddBusinessOn={setAddBusinessOn} />
+          </div>
+          <NumberInput
+            rawInput={rawInput}
+            isInputFocused={isInputFocused}
+            setIsInputFocused={setIsInputFocused}
+            handleInputChange={handleInputChange}
+            handleInputEnter={handleInputEnter}
           />
+          <ErrorAndStatus
+            callInProgress={callInProgress}
+            callTimerRef={callTimerRef}
+            callDuration={callDuration}
+            statusMessage={statusMessage}
+            errorMessage={errorMessage}
+            timeFormatter={timeFormatter}
+          />
+          <DialPad onPress={handleDialPress} onDelete={handleDelete} />
+          <div className="relative flex justify-center items-center w-full mt-4">
+            <MakeCallButton
+              handleCall={handleCall}
+              callInProgress={callInProgress}
+            />
+            <DeleteButton handleDelete={handleDelete} rawInput={rawInput} />
+          </div>
         </div>
-        <AddBusiness />
-      </div>
-      <div className="flex items-center w-60 mb-2 rounded focus-within:border-gray-400 hover:border-gray-400">
-        <span
-          className={`pl-9 pr-1 text-[18px] font-semibold text-gray-700 ${
-            rawInput ? "opacity-100 pl-11" : "opacity-0"
-          }`}
-        >
-          +1
-        </span>
-        <input
-          type="text"
-          value={rawInput || ""}
-          onFocus={() => setIsInputFocused(true)}
-          onBlur={() => setIsInputFocused(false)}
-          onChange={handleInputChange}
-          onKeyDown={(e) => handleInputEnter(e)}
-          placeholder={isInputFocused ? "999-999-9999" : "Enter a number"}
-          className={`flex-1 pr-4 py-2 text-[18px] font-semibold placeholder:text-lg bg-transparent
-            placeholder:font-normal placeholder:text-gray-500 focus:outline-none 
-            focus:placeholder:text-[18px] focus:placeholder:text-gray-300`}
-        />
-      </div>
-
-      <div className="h-1 flex items-center justify-center mb-2">
-        {callInProgress && callTimerRef.current ? (
-          <p className="text-green-600 text-base">
-            {timeFormatter(callDuration)}
-          </p>
-        ) : statusMessage ? (
-          <p className="text-green-600 text-base">{statusMessage}</p>
-        ) : errorMessage ? (
-          <p className="text-red-500 text-base">{errorMessage}</p>
-        ) : null}
-      </div>
-
-      <DialPad onPress={handleDialPress} onDelete={handleDelete} />
-
-      <div className="relative flex justify-center items-center w-full mt-4">
-        <button
-          onClick={handleCall}
-          className={`px-4 py-4 rounded-full transition ${
-            callInProgress ? "bg-red-500" : "bg-blue-600 hover:bg-blue-700"
-          }`}
-        >
-          <FaPhoneAlt
-            size={25}
-            color="white"
-            className={callInProgress ? "rotate-135" : ""}
-          />
-        </button>
-
-        <button
-          onClick={handleDelete}
-          className={`absolute right-16 transition-opacity duration-300 ${
-            rawInput
-              ? "opacity-100 pointer-events-auto"
-              : "opacity-0 pointer-events-none"
-          }`}
-        >
-          <FaBackspace size={30} color="gray" />
-        </button>
-      </div>
+      )}
     </div>
   );
 }
