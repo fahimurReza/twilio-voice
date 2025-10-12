@@ -11,17 +11,6 @@ function BusinessList() {
         <BusinessCard />
         <BusinessCard />
         <BusinessCard />
-        <BusinessCard />
-        <BusinessCard />
-        <BusinessCard />
-        <BusinessCard />
-        <BusinessCard />
-        <BusinessCard />
-        <BusinessCard />
-        <BusinessCard />
-        <BusinessCard />
-        <BusinessCard />
-        <BusinessCard />
       </div>
     </div>
   );

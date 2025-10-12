@@ -4,7 +4,7 @@ import { MdDelete } from "react-icons/md";
 function BusinessCard() {
   return (
     <div
-      className="pl-4 pr-5 py-1 flex items-center w-full border-b border-blue-300
+      className="pl-4 pr-7 py-1 flex items-center w-full border-b border-blue-300
     rounded-md group hover:bg-blue-100"
     >
       <div
