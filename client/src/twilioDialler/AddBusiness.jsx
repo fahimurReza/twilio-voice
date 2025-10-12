@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { MdDialpad } from "react-icons/md";
 import { formatNumber } from "../utils";
-import { addBusinessNumber } from "../store/store";
+import { addBusiness } from "../store/store";
 import CustomHeader from "./CustomHeader";
 import NumberInput from "./NumberInput";
 import BusinessList from "./BusinessList";
@@ -37,9 +37,7 @@ function AddBusiness({ CloseAddBusiness }) {
 
   const handleSubmit = () => {
     if (businessNumber && businessName) {
-      dispatch(
-        addBusinessNumber({ name: businessName, number: businessNumber })
-      );
+      dispatch(addBusiness({ name: businessName, number: businessNumber }));
       setBusinessNumber("");
       setBusinessName("");
     }

@@ -28,23 +28,30 @@ function Dialer() {
   const [isSelectError, setIsSelectError] = useState(false);
   const [isAddBusinessOn, setAddBusinessOn] = useState(false);
 
-  const twilioNumbers = [
-    { label: "Asheboro Tree", value: "+13365230067" },
-    { label: "Plano Concrete", value: "+14694094540" },
-    { label: "Texarkana Tree", value: "+18706002037" },
-  ];
-
   const dispatch = useDispatch();
   const activeCall = useRef(null);
   const callTimerRef = useRef(null);
 
   const {
-    rawInput = "",
+    inputValue = "",
     fromNumber = "",
+    businesses = [],
     startCall,
   } = useSelector((state) => {
-    return state.calls || { rawInput: "", fromNumber: "", startCall: false };
+    return (
+      state.calls || {
+        inputValue: "",
+        fromNumber: "",
+        businesses: [],
+        startCall: false,
+      }
+    );
   });
+
+  const twilioNumbers = businesses.map((business) => ({
+    value: business.number,
+    label: business.name,
+  }));
 
   // Setup Twilio Device
   useEffect(() => {
@@ -64,15 +71,15 @@ function Dialer() {
 
   // useEffect to auto-trigger handleCall on startCall flag
   useEffect(() => {
-    if (startCall && device && fromNumber && rawInput) {
+    if (startCall && device && fromNumber && inputValue) {
       setIsSelectError(false);
       setAddBusinessOn(false);
       handleCall();
       dispatch(
-        setCallInput({ phoneNumber: rawInput, fromNumber, startCall: false })
+        setCallInput({ phoneNumber: inputValue, fromNumber, startCall: false })
       );
     }
-  }, [startCall, device, fromNumber, rawInput, dispatch]);
+  }, [startCall, device, fromNumber, inputValue, dispatch]);
 
   // Input & DialPad handlers
   const handleInputChange = (e) => {
@@ -97,7 +104,7 @@ function Dialer() {
   };
 
   const handleDialPress = (digit) => {
-    const currentDigits = rawInput.replace(/\D/g, "");
+    const currentDigits = inputValue.replace(/\D/g, "");
     const newDigits = (currentDigits + digit).slice(0, 10);
     dispatch(
       setCallInput({
@@ -110,7 +117,7 @@ function Dialer() {
   };
 
   const handleDelete = () => {
-    const currentDigits = rawInput.replace(/\D/g, "");
+    const currentDigits = inputValue.replace(/\D/g, "");
     const newDigits = currentDigits.slice(0, -1);
     dispatch(
       setCallInput({
@@ -124,7 +131,7 @@ function Dialer() {
   const handleSelectChange = (selected) => {
     dispatch(
       setCallInput({
-        phoneNumber: rawInput,
+        phoneNumber: inputValue,
         fromNumber: selected ? selected.value : "",
         startCall: false,
       })
@@ -149,11 +156,11 @@ function Dialer() {
       setErrorMessage("Please Connect the Server");
       return;
     }
-    if (!rawInput) {
+    if (!inputValue) {
       setErrorMessage("Please Enter a Number");
       return;
     }
-    if (rawInput.length < 14) {
+    if (inputValue.length < 14) {
       setErrorMessage("Invalid Number");
       return;
     }
@@ -166,7 +173,7 @@ function Dialer() {
       return;
     }
 
-    const digits = rawInput.replace(/\D/g, "");
+    const digits = inputValue.replace(/\D/g, "");
     dispatch(
       setCallInput({
         phoneNumber: formatNumber(digits),
@@ -246,7 +253,7 @@ function Dialer() {
             <AddBusinessButton setAddBusinessOn={setAddBusinessOn} />
           </div>
           <NumberInput
-            inputValue={rawInput}
+            inputValue={inputValue}
             isInputFocused={isInputFocused}
             setIsInputFocused={setIsInputFocused}
             handleInputChange={handleInputChange}
@@ -269,7 +276,7 @@ function Dialer() {
               handleCall={handleCall}
               callInProgress={callInProgress}
             />
-            <DeleteButton handleDelete={handleDelete} rawInput={rawInput} />
+            <DeleteButton handleDelete={handleDelete} inputValue={inputValue} />
           </div>
         </div>
       )}

@@ -3,18 +3,16 @@ import { configureStore, createSlice } from "@reduxjs/toolkit";
 const loadState = () => {
   try {
     const serializedCallHistory = localStorage.getItem("callHistory");
-    const serializedBusinessNumbers = localStorage.getItem("businessNumbers");
+    const serializedBusinesses = localStorage.getItem("businesses");
     return {
       callHistory: serializedCallHistory
         ? JSON.parse(serializedCallHistory)
         : [],
-      businessNumbers: serializedBusinessNumbers
-        ? JSON.parse(serializedBusinessNumbers)
-        : [],
+      businesses: serializedBusinesses ? JSON.parse(serializedBusinesses) : [],
     };
   } catch (err) {
     console.error("Failed to load state:", err);
-    return { callHistory: [], businessNumbers: [] };
+    return { callHistory: [], businesses: [] };
   }
 };
 
@@ -22,8 +20,8 @@ const callSlice = createSlice({
   name: "calls",
   initialState: {
     callHistory: loadState().callHistory,
-    businessNumbers: loadState().businessNumbers,
-    rawInput: "",
+    businesses: loadState().businesses,
+    inputValue: "",
     fromNumber: "",
     startCall: false,
   },
@@ -51,36 +49,30 @@ const callSlice = createSlice({
       }
     },
     setCallInput: (state, action) => {
-      state.rawInput = action.payload.phoneNumber || "";
+      state.inputValue = action.payload.phoneNumber || "";
       state.fromNumber = action.payload.fromNumber || "";
       state.startCall = action.payload.startCall || false;
     },
-    addBusinessNumber: (state, action) => {
-      state.businessNumbers.push(action.payload);
+    addBusiness: (state, action) => {
+      state.businesses.push(action.payload);
       try {
-        localStorage.setItem(
-          "businessNumbers",
-          JSON.stringify(state.businessNumbers)
-        );
+        localStorage.setItem("businesses", JSON.stringify(state.businesses));
       } catch (err) {
-        console.error("Failed to save business numbers:", err);
+        console.error("Failed to save businesses:", err);
       }
     },
-    removeBusinessNumber: (state, action) => {
+    removeBusiness: (state, action) => {
       if (action.payload === undefined) {
-        console.error("removeBusinessNumber: Index is undefined");
+        console.error("removeBusiness: Index is undefined");
         return;
       }
-      state.businessNumbers = state.businessNumbers.filter(
+      state.businesses = state.businesses.filter(
         (_, index) => index !== action.payload
       );
       try {
-        localStorage.setItem(
-          "businessNumbers",
-          JSON.stringify(state.businessNumbers)
-        );
+        localStorage.setItem("businesses", JSON.stringify(state.businesses));
       } catch (err) {
-        console.error("Failed to save business numbers:", err);
+        console.error("Failed to save businesses:", err);
       }
     },
   },
@@ -90,8 +82,8 @@ export const {
   addCall,
   removeCall,
   setCallInput,
-  addBusinessNumber,
-  removeBusinessNumber,
+  addBusiness,
+  removeBusiness,
 } = callSlice.actions;
 export const store = configureStore({
   reducer: {

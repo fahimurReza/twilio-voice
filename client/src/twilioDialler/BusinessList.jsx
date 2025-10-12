@@ -1,9 +1,9 @@
 import { useSelector, useDispatch } from "react-redux";
-import { removeBusinessNumber } from "../store/store";
+import { removeBusiness } from "../store/store";
 import BusinessCard from "./BusinessCard";
 
 function BusinessList() {
-  const businessNumbers = useSelector((state) => state.calls.businessNumbers);
+  const businesses = useSelector((state) => state.calls.businesses);
   const dispatch = useDispatch();
 
   return (
@@ -12,8 +12,8 @@ function BusinessList() {
         Existing Business
       </div>
       <div className="overflow-y-auto h-[258px]">
-        {businessNumbers.length > 0 ? (
-          [...businessNumbers]
+        {businesses.length > 0 ? (
+          [...businesses]
             .reverse()
             .map((business, index) => (
               <BusinessCard
@@ -22,9 +22,7 @@ function BusinessList() {
                 name={business.name}
                 number={business.number}
                 onDelete={() =>
-                  dispatch(
-                    removeBusinessNumber(businessNumbers.length - 1 - index)
-                  )
+                  dispatch(removeBusiness(businesses.length - 1 - index))
                 }
               />
             ))
