@@ -4,8 +4,8 @@ function MakeCallButton({ handleCall, callInProgress }) {
   return (
     <button
       onClick={handleCall}
-      className={`px-4 py-4 rounded-full transition ${
-        callInProgress ? "bg-red-500" : "bg-blue-600 hover:bg-blue-700"
+      className={`px-4 py-4 rounded-full transition focus:outline-none cursor-pointer ${
+        callInProgress ? "bg-red-500" : "bg-blue-600 hover:bg-blue-800"
       }`}
     >
       <FaPhoneFlip

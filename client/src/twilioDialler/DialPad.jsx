@@ -68,8 +68,10 @@ const DialPad = ({ onPress, onDelete }) => {
           onPointerDown={() => handlePressStart(digit)}
           onPointerUp={() => handlePressEnd(digit)}
           className={`w-13 h-13 flex flex-col justify-center items-center bg-blue-100 
-            border border-blue-300 rounded-full hover:bg-blue-200 transition shadow-sm 
-            font-semibold ${digit === "1" ? "pb-[15px]" : ""}`}
+            border border-blue-300 rounded-full hover:bg-blue-300 transition shadow-sm 
+            font-semibold focus:outline-none cursor-pointer ${
+              digit === "1" ? "pb-[15px]" : ""
+            }`}
         >
           <span className="text-xl font-semibold leading-none">{digit}</span>
           {letters && (
