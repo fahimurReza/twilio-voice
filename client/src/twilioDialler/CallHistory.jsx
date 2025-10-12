@@ -8,7 +8,7 @@ function CallHistory() {
     <div className="w-1/2 flex flex-col">
       <CustomHeader
         headline={"Call History"}
-        className="rounded-tl-lg h-[160px]"
+        className="rounded-tl-lg h-[72px]"
       />
       <div className="overflow-y-auto mt-[-10px]">
         {Array.isArray(callHistory) && callHistory.length > 0 ? (

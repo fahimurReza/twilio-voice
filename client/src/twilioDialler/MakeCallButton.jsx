@@ -11,7 +11,7 @@ function MakeCallButton({ handleCall, callInProgress }) {
       <FaPhoneFlip
         size={26}
         color="white"
-        className={callInProgress ? "rotate-135" : ""}
+        className={callInProgress ? "rotate-225" : ""}
       />
     </button>
   );

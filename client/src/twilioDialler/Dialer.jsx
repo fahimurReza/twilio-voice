@@ -66,6 +66,7 @@ function Dialer() {
   useEffect(() => {
     if (startCall && device && fromNumber && rawInput) {
       setIsSelectError(false);
+      setAddBusinessOn(false);
       handleCall();
       dispatch(
         setCallInput({ phoneNumber: rawInput, fromNumber, startCall: false })

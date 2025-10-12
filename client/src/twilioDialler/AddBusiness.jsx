@@ -11,7 +11,7 @@ function AddBusiness({ onClose }) {
     <div className="flex flex-col items-center relative w-full">
       <CustomHeader
         headline={" Add a New Business"}
-        className="w-full rounded-tr-md h-[72px]"
+        className="w-full rounded-tr-md h-[70px]"
       />
       <div className="flex flex-col items-center mt-4">
         <input
