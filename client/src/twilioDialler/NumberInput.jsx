@@ -1,9 +1,8 @@
 import React from "react";
 
 function NumberInput({
-  rawInput,
+  inputValue,
   isInputFocused,
-  setIsInputFocused,
   handleInputChange,
   handleInputEnter,
   className,
@@ -17,7 +16,7 @@ function NumberInput({
       <div className={`flex items-center w-58 mb-2 ${className || ""}`}>
         <input
           type="text"
-          value={rawInput || ""}
+          value={inputValue || ""}
           onFocus={setOnFocus}
           onBlur={setOnBlur}
           onChange={handleInputChange}

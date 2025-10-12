@@ -3,9 +3,28 @@ import { MdDialpad } from "react-icons/md";
 import CustomHeader from "./CustomHeader";
 import NumberInput from "./NumberInput";
 import BusinessList from "./BusinessList";
+import { formatNumber } from "../utils";
 
-function AddBusiness({ onClose }) {
+function AddBusiness({ CloseAddBusiness }) {
   const [isBusinessInputFocused, setIsBusinessInputFocused] = useState(false);
+  const [businessNumber, setBusinessNumber] = useState("");
+
+  const handleInputChange = (e) => {
+    const allDigits = e.target.value.replace(/\D/g, "");
+    let phoneDigits = allDigits;
+    if (allDigits.length > 10 && allDigits.startsWith("1")) {
+      phoneDigits = allDigits.slice(1, 11);
+    } else {
+      phoneDigits = allDigits.slice(0, 10);
+    }
+    setBusinessNumber(formatNumber(phoneDigits));
+  };
+
+  const handleInputEnter = (e) => {
+    if (e.key === "Enter") {
+      console.log("Enter pressed with value:", businessNumber);
+    }
+  };
 
   return (
     <div className="flex flex-col items-center relative w-full">
@@ -22,11 +41,14 @@ function AddBusiness({ onClose }) {
         />
 
         <NumberInput
+          setOnFocus={() => setIsBusinessInputFocused(true)}
+          setOnBlur={() => setIsBusinessInputFocused(false)}
+          handleInputChange={handleInputChange}
+          handleInputEnter={handleInputEnter}
+          inputValue={businessNumber}
           className="mt-3 w-60"
           inputClassName="border border-blue-400 h-9 rounded placeholder:text-base 
           focus:outline-1 focus:outline-blue-400"
-          setOnFocus={() => setIsBusinessInputFocused(true)}
-          setOnBlur={() => setIsBusinessInputFocused(false)}
           placeholder={
             isBusinessInputFocused ? "(999) 999-9999" : "Business Phone Number"
           }
@@ -40,7 +62,7 @@ function AddBusiness({ onClose }) {
       </button>
       <BusinessList />
       <div
-        onClick={onClose}
+        onClick={CloseAddBusiness}
         className="p-3 w-13 h-13 cursor-pointer z-100 rounded-full bg-blue-400 absolute 
         bottom-8 right-8 hover:bg-blue-500"
       >

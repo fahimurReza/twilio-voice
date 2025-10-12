@@ -232,7 +232,7 @@ function Dialer() {
   return (
     <div className="w-1/2">
       {isAddBusinessOn ? (
-        <AddBusiness onClose={() => setAddBusinessOn(false)} />
+        <AddBusiness CloseAddBusiness={() => setAddBusinessOn(false)} />
       ) : (
         <div className="flex flex-col justify-center items-center py-7">
           <div className="flex justify-center items-center mb-2">
@@ -246,7 +246,7 @@ function Dialer() {
             <AddBusinessButton setAddBusinessOn={setAddBusinessOn} />
           </div>
           <NumberInput
-            rawInput={rawInput}
+            inputValue={rawInput}
             isInputFocused={isInputFocused}
             setIsInputFocused={setIsInputFocused}
             handleInputChange={handleInputChange}
