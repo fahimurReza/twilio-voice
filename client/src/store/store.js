@@ -1,23 +1,31 @@
 import { configureStore, createSlice } from "@reduxjs/toolkit";
 
-// Load initial state from localStorage
 const loadState = () => {
   try {
-    const serializedState = localStorage.getItem("callHistory");
-    return serializedState ? JSON.parse(serializedState) : [];
+    const serializedCallHistory = localStorage.getItem("callHistory");
+    const serializedBusinessNumbers = localStorage.getItem("businessNumbers");
+    return {
+      callHistory: serializedCallHistory
+        ? JSON.parse(serializedCallHistory)
+        : [],
+      businessNumbers: serializedBusinessNumbers
+        ? JSON.parse(serializedBusinessNumbers)
+        : [],
+    };
   } catch (err) {
-    console.error("Failed to load call history:", err);
-    return [];
+    console.error("Failed to load state:", err);
+    return { callHistory: [], businessNumbers: [] };
   }
 };
 
 const callSlice = createSlice({
   name: "calls",
   initialState: {
-    callHistory: loadState(),
+    callHistory: loadState().callHistory,
+    businessNumbers: loadState().businessNumbers,
     rawInput: "",
     fromNumber: "",
-    startCall: false, // CHANGE: Add startCall flag to trigger auto-call
+    startCall: false,
   },
   reducers: {
     addCall: (state, action) => {
@@ -45,12 +53,46 @@ const callSlice = createSlice({
     setCallInput: (state, action) => {
       state.rawInput = action.payload.phoneNumber || "";
       state.fromNumber = action.payload.fromNumber || "";
-      state.startCall = action.payload.startCall || false; // CHANGE: Set startCall from payload
+      state.startCall = action.payload.startCall || false;
+    },
+    addBusinessNumber: (state, action) => {
+      state.businessNumbers.push(action.payload);
+      try {
+        localStorage.setItem(
+          "businessNumbers",
+          JSON.stringify(state.businessNumbers)
+        );
+      } catch (err) {
+        console.error("Failed to save business numbers:", err);
+      }
+    },
+    removeBusinessNumber: (state, action) => {
+      if (action.payload === undefined) {
+        console.error("removeBusinessNumber: Index is undefined");
+        return;
+      }
+      state.businessNumbers = state.businessNumbers.filter(
+        (_, index) => index !== action.payload
+      );
+      try {
+        localStorage.setItem(
+          "businessNumbers",
+          JSON.stringify(state.businessNumbers)
+        );
+      } catch (err) {
+        console.error("Failed to save business numbers:", err);
+      }
     },
   },
 });
 
-export const { addCall, removeCall, setCallInput } = callSlice.actions;
+export const {
+  addCall,
+  removeCall,
+  setCallInput,
+  addBusinessNumber,
+  removeBusinessNumber,
+} = callSlice.actions;
 export const store = configureStore({
   reducer: {
     calls: callSlice.reducer,

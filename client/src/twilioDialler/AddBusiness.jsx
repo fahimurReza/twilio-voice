@@ -1,15 +1,20 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { MdDialpad } from "react-icons/md";
+import { formatNumber } from "../utils";
+import { addBusinessNumber } from "../store/store";
 import CustomHeader from "./CustomHeader";
 import NumberInput from "./NumberInput";
 import BusinessList from "./BusinessList";
-import { formatNumber } from "../utils";
 
 function AddBusiness({ CloseAddBusiness }) {
-  const [isBusinessInputFocused, setIsBusinessInputFocused] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const [businessNumber, setBusinessNumber] = useState("");
+  const [businessName, setBusinessName] = useState("");
 
-  const handleInputChange = (e) => {
+  const dispatch = useDispatch();
+
+  const handleNumberChange = (e) => {
     const allDigits = e.target.value.replace(/\D/g, "");
     let phoneDigits = allDigits;
     if (allDigits.length > 10 && allDigits.startsWith("1")) {
@@ -20,9 +25,23 @@ function AddBusiness({ CloseAddBusiness }) {
     setBusinessNumber(formatNumber(phoneDigits));
   };
 
+  const handleNameChange = (e) => {
+    setBusinessName(e.target.value);
+  };
+
   const handleInputEnter = (e) => {
     if (e.key === "Enter") {
-      console.log("Enter pressed with value:", businessNumber);
+      handleSubmit();
+    }
+  };
+
+  const handleSubmit = () => {
+    if (businessNumber && businessName) {
+      dispatch(
+        addBusinessNumber({ name: businessName, number: businessNumber })
+      );
+      setBusinessNumber("");
+      setBusinessName("");
     }
   };
 
@@ -34,6 +53,8 @@ function AddBusiness({ CloseAddBusiness }) {
       />
       <div className="flex flex-col items-center mt-4">
         <input
+          value={businessName}
+          onChange={handleNameChange}
           placeholder={"Name of the Business"}
           className="border rounded border-blue-400 w-60 h-9 placeholder:text-[18px] 
           text-center placeholder:text-gray-500 focus:outline-blue-400 focus:outline-1 
@@ -41,20 +62,21 @@ function AddBusiness({ CloseAddBusiness }) {
         />
 
         <NumberInput
-          setOnFocus={() => setIsBusinessInputFocused(true)}
-          setOnBlur={() => setIsBusinessInputFocused(false)}
-          handleInputChange={handleInputChange}
+          setOnFocus={() => setIsInputFocused(true)}
+          setOnBlur={() => setIsInputFocused(false)}
+          handleInputChange={handleNumberChange}
           handleInputEnter={handleInputEnter}
           inputValue={businessNumber}
           className="mt-3 w-60"
           inputClassName="border border-blue-400 h-9 rounded placeholder:text-base 
           focus:outline-1 focus:outline-blue-400"
           placeholder={
-            isBusinessInputFocused ? "(999) 999-9999" : "Business Phone Number"
+            isInputFocused ? "(999) 999-9999" : "Business Phone Number"
           }
         />
       </div>
       <button
+        onClick={handleSubmit}
         className="rounded px-4 h-9 mt-2 text-[18px] bg-blue-300 cursor-pointer 
       hover:bg-blue-400 border border-blue-500"
       >
