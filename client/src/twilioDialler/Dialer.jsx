@@ -260,7 +260,7 @@ function Dialer() {
             handleInputEnter={handleInputEnter}
             setOnFocus={() => setIsInputFocused(true)}
             setOnBlur={() => setIsInputFocused(false)}
-            inputClassName="focus:outline-none"
+            inputClassName="focus:outline-none text-[18px] font-semibold "
           />
           <ErrorAndStatus
             callInProgress={callInProgress}

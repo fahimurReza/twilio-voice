@@ -4,22 +4,20 @@ import { MdDelete } from "react-icons/md";
 function BusinessCard({ name, number, onDelete, index }) {
   return (
     <div
-      className="pl-4 pr-7 py-1 flex items-center w-full border-b border-blue-300
-    rounded-md group hover:bg-blue-100"
+      className="pl-4 pr-7 py-1 h-[40px] flex items-center w-full border-b border-blue-300
+      group hover:bg-blue-100"
     >
-      <div
-        className="h-8 w-8 p-[6px] pr-[2px] rounded-full bg-blue-200 
-      group-hover:bg-white group-hover:border group-hover:border-blue-300"
-      >
-        <FaHouseUser size={18} />
+      <div className="mr-1">
+        <FaHouseUser size={20} />
       </div>
       <div className="pl-2">{name}</div>
-      <div className="ml-auto text-base group-hover:hidden">{number}</div>
+      <div className="ml-auto text-sm group-hover:hidden">{number}</div>
       <div
         onClick={() => onDelete(index)}
-        className="ml-auto rounded-md justify-center items-center w-8 h-8 cursor-pointer hidden group-hover:flex bg-white border border-red-200"
+        className="ml-auto rounded-md justify-center items-center w-8 h-8 cursor-pointer 
+        hidden group-hover:flex bg-white border border-red-200"
       >
-        <MdDelete size={24} color="#ef4444" />
+        <MdDelete size={20} color="#ef4444" />
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ export const customStyles = (isSelectError) => ({
     minHeight: "44px",
     fontSize: "1.1rem", // text-base
     fontWeight: "400",
-    color: "#6b7280", // gray-500
+    color: "#1f2937", // gray-800
     transition: "border-color 0.2s ease",
     minHeight: "30px",
   }),
@@ -31,7 +31,7 @@ export const customStyles = (isSelectError) => ({
   }),
   singleValue: (provided) => ({
     ...provided,
-    color: "#6b7280", // gray-500
+    color: "#1f2937", // gray-800
     textAlign: "center",
     fontSize: "1.1rem",
   }),
@@ -45,11 +45,14 @@ export const customStyles = (isSelectError) => ({
   option: (provided, state) => ({
     ...provided,
     backgroundColor: state.isFocused ? "#eff6ff" : "white", // blue-50 hover
-    color: "#6b7280", // gray-500
-    textAlign: "center",
+    color: "#1f2937", // gray-800
     cursor: "pointer",
     fontSize: "1rem",
     padding: "10px 0",
+    height: "36px;",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
   }),
   // CHANGE: Add styles for down arrow
   dropdownIndicator: (provided, state) => ({

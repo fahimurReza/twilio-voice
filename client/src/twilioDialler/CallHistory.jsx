@@ -11,10 +11,10 @@ function CallHistory() {
         {Array.isArray(callHistory) && callHistory.length > 0 ? (
           [...callHistory]
             .reverse()
-            .map((call, displayIndex) => (
+            .map((record, displayIndex) => (
               <HistoryCard
                 key={callHistory.length - 1 - displayIndex}
-                call={call}
+                record={record}
                 index={callHistory.length - 1 - displayIndex}
               />
             ))

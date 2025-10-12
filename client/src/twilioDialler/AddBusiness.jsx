@@ -54,9 +54,11 @@ function AddBusiness({ CloseAddBusiness }) {
           value={businessName}
           onChange={handleNameChange}
           placeholder={"Name of the Business"}
+          maxLength={22}
           className="border rounded border-blue-400 w-60 h-9 placeholder:text-[18px] 
           text-center placeholder:text-gray-500 focus:outline-blue-400 focus:outline-1 
-          focus:placeholder:text-[18px] focus:placeholder:text-gray-300 "
+          focus:placeholder:text-[18px] focus:placeholder:text-gray-300 
+          text-gray-600 text-lg"
         />
 
         <NumberInput
@@ -67,7 +69,7 @@ function AddBusiness({ CloseAddBusiness }) {
           inputValue={businessNumber}
           className="mt-3 w-60"
           inputClassName="border border-blue-400 h-9 rounded placeholder:text-base 
-          focus:outline-1 focus:outline-blue-400"
+          focus:outline-1 focus:outline-blue-400 text-gray-600 text-lg"
           placeholder={
             isInputFocused ? "(999) 999-9999" : "Business Phone Number"
           }

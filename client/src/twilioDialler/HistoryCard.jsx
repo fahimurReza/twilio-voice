@@ -4,7 +4,7 @@ import { MdDelete } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
 import { removeCall, setCallInput } from "../store/store";
 
-function HistoryCard({ call, index }) {
+function HistoryCard({ record, index }) {
   const dispatch = useDispatch();
   const businesses = useSelector((state) => state.calls.businesses);
 
@@ -13,15 +13,13 @@ function HistoryCard({ call, index }) {
   };
 
   const handleCall = () => {
-    const fromNumber =
-      businesses.find((business) => business.name === call.business)?.number ||
-      "";
+    const business = businesses.find(
+      (business) => business.name === record.business
+    );
+    const fromNumber = business?.number || "";
+    const toNumber = record.phoneNumber;
     dispatch(
-      setCallInput({
-        phoneNumber: call.phoneNumber,
-        fromNumber,
-        startCall: true,
-      })
+      setCallInput({ phoneNumber: toNumber, fromNumber, startCall: true })
     );
   };
 
@@ -38,8 +36,8 @@ function HistoryCard({ call, index }) {
           <BsPersonFill size={26} />
         </div>
         <div className="ml-3 h-12 flex flex-col justify-center">
-          <div className="text-base">{call.phoneNumber}</div>
-          <div className="text-[13px] text-gray-600">{call.business}</div>
+          <div className="text-base">{record.phoneNumber}</div>
+          <div className="text-[13px] text-gray-600">{record.business}</div>
         </div>
         <div
           className="ml-auto rounded-md justify-center items-center w-9 h-9 cursor-pointer 
@@ -56,9 +54,11 @@ function HistoryCard({ call, index }) {
           <FaPhoneFlip size={18} color="#2563eb" />
         </div>
         <div className="ml-auto h-12 flex flex-col justify-center group-hover:hidden">
-          <div className="text-base text-right text-gray-600">{call.time}</div>
+          <div className="text-base text-right text-gray-600">
+            {record.time}
+          </div>
           <div className="text-[13px] text-gray-600 text-right">
-            {call.date}
+            {record.date}
           </div>
         </div>
       </div>
