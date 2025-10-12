@@ -7,7 +7,7 @@ function BusinessList() {
       <div className="p-1 pl-4 bg-gradient-to-r from-blue-300 to-white font-semibold">
         Existing Business
       </div>
-      <div className="overflow-y-auto h-[260px]">
+      <div className="overflow-y-auto h-[258px]">
         <BusinessCard />
         <BusinessCard />
         <BusinessCard />

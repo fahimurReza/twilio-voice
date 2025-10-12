@@ -6,11 +6,8 @@ function CallHistory() {
   const callHistory = useSelector((state) => state.calls.callHistory);
   return (
     <div className="w-1/2 flex flex-col">
-      <CustomHeader
-        headline={"Call History"}
-        className="rounded-tl-lg h-[72px]"
-      />
-      <div className="overflow-y-auto mt-[-10px]">
+      <CustomHeader headline={"Call History"} className="rounded-tl-lg" />
+      <div className="overflow-y-auto h-[480px] mt-[-10px]">
         {Array.isArray(callHistory) && callHistory.length > 0 ? (
           [...callHistory]
             .reverse()
