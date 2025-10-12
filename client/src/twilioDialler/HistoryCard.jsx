@@ -1,11 +1,12 @@
 import { BsPersonFill } from "react-icons/bs";
 import { FaPhoneFlip } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
-import { useDispatch } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { removeCall, setCallInput } from "../store/store";
 
 function HistoryCard({ call, index }) {
   const dispatch = useDispatch();
+  const businesses = useSelector((state) => state.calls.businesses);
 
   const handleDelete = () => {
     dispatch(removeCall(index));
@@ -13,17 +14,13 @@ function HistoryCard({ call, index }) {
 
   const handleCall = () => {
     const fromNumber =
-      [
-        { label: "Asheboro Tree", value: "+13365230067" },
-        { label: "Plano Concrete", value: "+14694094540" },
-        { label: "Texarkana Tree", value: "+18706002037" },
-      ].find((bus) => bus.label === call.business)?.value || "";
-
+      businesses.find((business) => business.name === call.business)?.number ||
+      "";
     dispatch(
       setCallInput({
         phoneNumber: call.phoneNumber,
         fromNumber,
-        startCall: true, // CHANGE: Set startCall to true to trigger auto-call
+        startCall: true,
       })
     );
   };
