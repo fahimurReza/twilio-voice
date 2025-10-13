@@ -69,7 +69,6 @@ app.all("/voice-webhook", (req, res) => {
   console.log(`Incoming call: CallSid=${CallSid}, To=${To}, From=${From}`);
   const dial = twiml.dial();
   dial.client("webuser");
-  twiml.say("Sorry, the dialer is unavailable. Please try again later.");
   res.type("text/xml");
   res.send(twiml.toString());
 });
