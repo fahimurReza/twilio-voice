@@ -55,18 +55,37 @@ function Dialer() {
 
   // Setup Twilio Device
   useEffect(() => {
-    if (!fromNumber) return;
-    fetch(
-      `https://twilio-voice-backend-f5sm.onrender.com/token?from=${fromNumber}`
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        const newDevice = new Device(data.token, { debug: true });
-        newDevice.on("ready", () => console.log("Device ready"));
-        newDevice.on("error", (err) => console.error("Device error:", err));
+    let newDevice;
+    const setupDevice = async () => {
+      try {
+        const res = await fetch(
+          `https://twilio-voice-backend-f5sm.onrender.com/token?from=${fromNumber}`
+        );
+        const data = await res.json();
+        newDevice = new Device(data.token, {
+          debug: true,
+          codecPreferences: ["opus", "pcmu"],
+        });
+        newDevice.on("registered", () => {
+          console.log("Twilio Device registered and ready for calls");
+        });
+        newDevice.on("error", (err) => {
+          console.error("Twilio Device error:", err);
+        });
+        newDevice.on("incoming", (call) => {
+          console.log("Incoming call from:", call.parameters.From);
+          call.accept();
+        });
+        newDevice.on("unregistered", () => {
+          console.log("Twilio Device unregistered");
+        });
+        await newDevice.register();
         setDevice(newDevice);
-      })
-      .catch((err) => console.error(err));
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    setupDevice();
   }, [fromNumber]);
 
   // useEffect to auto-trigger handleCall on startCall flag
@@ -164,7 +183,6 @@ function Dialer() {
       setErrorMessage("Invalid Number");
       return;
     }
-
     if (callInProgress && activeCall.current) {
       activeCall.current.disconnect();
       setCallInProgress(false);
@@ -174,6 +192,7 @@ function Dialer() {
     }
 
     const digits = inputValue.replace(/\D/g, "");
+
     dispatch(
       setCallInput({
         phoneNumber: formatNumber(digits),
