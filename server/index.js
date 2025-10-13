@@ -16,12 +16,11 @@ const VoiceGrant = AccessToken.VoiceGrant;
 const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
 const twilioApiKey = process.env.TWILIO_API_KEY;
 const twilioApiSecret = process.env.TWILIO_API_SECRET;
-const outgoingApplicationSid = process.env.TWIML_APP_SID;
+const outgoingApplicationSid = process.env.TWIML_APP_SID_OUTGOING;
 
 app.get("/token", (req, res) => {
   const identity = "webuser";
   const selectedFrom = req.query.from;
-
   const voiceGrant = new VoiceGrant({
     outgoingApplicationSid: outgoingApplicationSid,
     incomingAllow: true,
@@ -64,17 +63,13 @@ app.all("/voice", (req, res) => {
   res.send(twiml.toString());
 });
 
-app.post("/voice-webhook", (req, res) => {
+app.all("/voice-webhook", (req, res) => {
   const twiml = new VoiceResponse();
   const { To, From, CallSid } = req.body;
-
   console.log(`Incoming call: CallSid=${CallSid}, To=${To}, From=${From}`);
-
   const dial = twiml.dial();
   dial.client("webuser");
-
   twiml.say("Sorry, the dialer is unavailable. Please try again later.");
-
   res.type("text/xml");
   res.send(twiml.toString());
 });
