@@ -10,6 +10,7 @@ import ErrorAndStatus from "./ErrorAndStatus";
 import MakeCallButton from "./MakeCallButton";
 import DeleteButton from "./DeleteButton";
 import AddBusinessButton from "./AddBusinessButton";
+import IncomingWindow from "./IncomingWindow";
 
 import {
   timeFormatter,
@@ -27,6 +28,9 @@ function Dialer() {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isSelectError, setIsSelectError] = useState(false);
   const [isAddBusinessOn, setAddBusinessOn] = useState(false);
+  const [incomingConnection, setIncomingConnection] = useState(null);
+  const [showIncomingCall, setShowIncomingCall] = useState(false);
+  const [incomingPhoneNumber, setIncomingPhoneNumber] = useState("");
 
   const dispatch = useDispatch();
   const activeCall = useRef(null);
@@ -56,18 +60,59 @@ function Dialer() {
   // Setup Twilio Device
   useEffect(() => {
     if (!fromNumber) return;
+
     fetch(
       `https://twilio-voice-backend-f5sm.onrender.com/token?from=${fromNumber}`
     )
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP error ${res.status}`);
+        return res.json();
+      })
       .then((data) => {
-        const newDevice = new Device(data.token, { debug: true });
-        newDevice.on("ready", () => console.log("Device ready"));
-        newDevice.on("error", (err) => console.error("Device error:", err));
+        const newDevice = new Device(data.token, {
+          debug: true,
+          // Ensure WebRTC audio is enabled
+          allowIncomingWhileBusy: true, // Allow incoming even if on another call
+        });
+
+        newDevice.on("ready", () => {
+          console.log("Device ready");
+        });
+
+        newDevice.on("error", (err) => {
+          console.error("Device error:", err);
+          setErrorMessage(`Device error: ${err.message}`);
+        });
+
+        newDevice.on("incoming", (connection) => {
+          console.log("Incoming call from:", connection.parameters.From);
+          setIncomingConnection(connection);
+          setShowIncomingCall(true);
+          setIncomingPhoneNumber(connection.parameters.From);
+        });
+
+        newDevice.on("cancel", () => {
+          console.log("Incoming call canceled");
+          setShowIncomingCall(false);
+          setIncomingConnection(null);
+          setIncomingPhoneNumber("");
+        });
+
         setDevice(newDevice);
       })
-      .catch((err) => console.error(err));
-  }, [fromNumber]);
+      .catch((err) => {
+        console.error("Token fetch error:", err);
+        setErrorMessage("Failed to initialize device");
+      });
+
+    // Cleanup on unmount or fromNumber change
+    return () => {
+      if (device) {
+        device.destroy();
+        console.log("Device destroyed");
+      }
+    };
+  }, [fromNumber, device]);
 
   // useEffect to auto-trigger handleCall on startCall flag
   useEffect(() => {
@@ -238,7 +283,9 @@ function Dialer() {
 
   return (
     <div className="w-1/2">
-      {isAddBusinessOn ? (
+      {showIncomingCall ? (
+        <IncomingWindow />
+      ) : isAddBusinessOn ? (
         <AddBusiness CloseAddBusiness={() => setAddBusinessOn(false)} />
       ) : (
         <div className="flex flex-col justify-center items-center py-7">

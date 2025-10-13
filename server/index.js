@@ -64,6 +64,21 @@ app.all("/voice", (req, res) => {
   res.send(twiml.toString());
 });
 
+app.post("/voice-webhook", (req, res) => {
+  const twiml = new VoiceResponse();
+  const { To, From, CallSid } = req.body;
+
+  console.log(`Incoming call: CallSid=${CallSid}, To=${To}, From=${From}`);
+
+  const dial = twiml.dial();
+  dial.client("webuser");
+
+  twiml.say("Sorry, the dialer is unavailable. Please try again later.");
+
+  res.type("text/xml");
+  res.send(twiml.toString());
+});
+
 const PORT = 5000;
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
