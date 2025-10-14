@@ -68,7 +68,7 @@ app.all("/voice-webhook", (req, res) => {
   const { To, From, CallSid } = req.body;
 
   const dial = twiml.dial();
-  const client = dial.client("webuser");
+  const client = dial.client("webuser", { identity: "webuser" });
   client.parameter({ name: "calledNumber", value: To });
   client.parameter({ name: "callerNumber", value: From });
 
