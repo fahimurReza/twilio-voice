@@ -69,7 +69,13 @@ app.all("/voice-webhook", (req, res) => {
   const twiml = new VoiceResponse();
 
   const dial = twiml.dial();
-  dial.client("webuser");
+  dial.client({
+    identity: "webuser",
+    parameters: {
+      calledNumber: To,
+      callerNumber: From,
+    },
+  });
 
   res.type("text/xml");
   res.send(twiml.toString());
