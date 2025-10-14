@@ -10,6 +10,7 @@ import ErrorAndStatus from "./ErrorAndStatus";
 import MakeCallButton from "./MakeCallButton";
 import DeleteButton from "./DeleteButton";
 import AddBusinessButton from "./AddBusinessButton";
+import IncomingWindow from "./IncomingWindow";
 
 import {
   timeFormatter,
@@ -27,6 +28,9 @@ function Dialer() {
   const [isInputFocused, setIsInputFocused] = useState(false);
   const [isSelectError, setIsSelectError] = useState(false);
   const [isAddBusinessOn, setAddBusinessOn] = useState(false);
+  const [incomingPhoneNumber, setIncomingPhoneNumber] = useState("");
+  const [incomingTwilioNumber, setIncomingTwilioNumber] = useState("");
+  const [showIncomingCall, setShowIncomingCall] = useState(false);
 
   const dispatch = useDispatch();
   const activeCall = useRef(null);
@@ -73,7 +77,9 @@ function Dialer() {
           console.error("Twilio Device error:", err);
         });
         newDevice.on("incoming", (call) => {
-          console.log("Incoming call from:", call.parameters.From);
+          setShowIncomingCall(true);
+          setIncomingPhoneNumber(call.customParameters.get("callerNumber"));
+          setIncomingTwilioNumber(call.customParameters.get("calledNumber"));
           call.accept();
         });
         newDevice.on("unregistered", () => {
@@ -257,7 +263,9 @@ function Dialer() {
 
   return (
     <div className="w-1/2">
-      {isAddBusinessOn ? (
+      {showIncomingCall ? (
+        <IncomingWindow />
+      ) : isAddBusinessOn ? (
         <AddBusiness CloseAddBusiness={() => setAddBusinessOn(false)} />
       ) : (
         <div className="flex flex-col justify-center items-center py-7">
