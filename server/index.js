@@ -64,9 +64,8 @@ app.all("/voice", (req, res) => {
 });
 
 app.all("/voice-webhook", (req, res) => {
-  console.log("Incoming webhook hit from Twilio!");
-  console.log("Body:", req.body);
   const twiml = new VoiceResponse();
+  const { To, From, CallSid } = req.body;
 
   const dial = twiml.dial();
   dial.client({
