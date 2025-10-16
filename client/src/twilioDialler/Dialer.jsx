@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addCall, setCallInput } from "../store/store";
-import { Device } from "@twilio/voice-sdk";
+import { useTwilioDevice } from "../hooks/useTwilioDevice";
 import DialPad from "./DialPad";
 import AddBusiness from "./AddBusiness";
 import NumberInput from "./NumberInput";
@@ -11,7 +11,6 @@ import MakeCallButton from "./MakeCallButton";
 import DeleteButton from "./DeleteButton";
 import AddBusinessButton from "./AddBusinessButton";
 import IncomingWindow from "./IncomingWindow";
-
 import {
   timeFormatter,
   currentTime,
@@ -32,7 +31,6 @@ function Dialer() {
   const [incomingTwilioNumber, setIncomingTwilioNumber] = useState("");
   const [showIncomingCall, setShowIncomingCall] = useState(false);
   const [incomingConnection, setIncomingConnection] = useState(null);
-  const [accepted, setAccepted] = useState(false);
 
   const dispatch = useDispatch();
   const activeCall = useRef(null);
@@ -60,69 +58,29 @@ function Dialer() {
     label: business.name,
   }));
 
+  // Use the custom Twilio Device setup hook
+  const {
+    device: twilioDevice,
+    setAccepted,
+    accepted,
+  } = useTwilioDevice(
+    fromNumber,
+    setShowIncomingCall,
+    setIncomingPhoneNumber,
+    setIncomingTwilioNumber,
+    setIncomingConnection
+  );
+
   useEffect(() => {
     acceptedRef.current = accepted;
-  }, [accepted]);
-
-  // Setup Twilio Device
-  useEffect(() => {
-    let newDevice;
-    const setupDevice = async () => {
-      try {
-        const res = await fetch(
-          `https://twilio-voice-backend-f5sm.onrender.com/token?from=${fromNumber}`
-        );
-        const data = await res.json();
-        newDevice = new Device(data.token, {
-          debug: true,
-          codecPreferences: ["opus", "pcmu"],
-        });
-        newDevice.on("registered", () => {
-          console.log("Twilio Device registered and ready for calls");
-        });
-        newDevice.on("error", (err) => {
-          console.error("Twilio Device error:", err);
-        });
-        newDevice.on("incoming", (call) => {
-          setShowIncomingCall(true);
-          setIncomingPhoneNumber(call.customParameters.get("callerNumber"));
-          setIncomingTwilioNumber(call.customParameters.get("calledNumber"));
-          setIncomingConnection(call);
-          call.on("accept", () => {
-            console.log("Call accepted, status:", call.status());
-          });
-          call.on("cancel", () => {
-            if (!acceptedRef.current && call.status() !== "open") {
-              setShowIncomingCall(false);
-            }
-          });
-          call.on("disconnect", () => {
-            console.log("Incoming call disconnected, status:", call.status());
-            setShowIncomingCall(false);
-            setIncomingPhoneNumber("");
-            setIncomingTwilioNumber("");
-            setIncomingConnection(null);
-          });
-          call.on("error", (err) => {
-            console.error("Call error:", err);
-          });
-        });
-        newDevice.on("unregistered", () => {
-          console.log("Twilio Device unregistered");
-        });
-        await newDevice.register();
-        setDevice(newDevice);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    setupDevice();
-  }, [fromNumber]);
+    setDevice(twilioDevice);
+  }, [accepted, twilioDevice]);
 
   // Handler for accepting incoming call
   const acceptIncoming = () => {
     if (incomingConnection) {
       acceptedRef.current = true;
+      setAccepted(true);
       incomingConnection.accept();
     }
   };
