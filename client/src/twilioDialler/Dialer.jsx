@@ -31,10 +31,13 @@ function Dialer() {
   const [incomingPhoneNumber, setIncomingPhoneNumber] = useState("");
   const [incomingTwilioNumber, setIncomingTwilioNumber] = useState("");
   const [showIncomingCall, setShowIncomingCall] = useState(false);
+  const [incomingConnection, setIncomingConnection] = useState(null);
+  const [accepted, setAccepted] = useState(false);
 
   const dispatch = useDispatch();
   const activeCall = useRef(null);
   const callTimerRef = useRef(null);
+  const acceptedRef = useRef(false);
 
   const {
     inputValue = "",
@@ -56,6 +59,10 @@ function Dialer() {
     value: business.number,
     label: business.name,
   }));
+
+  useEffect(() => {
+    acceptedRef.current = accepted;
+  }, [accepted]);
 
   // Setup Twilio Device
   useEffect(() => {
@@ -80,7 +87,25 @@ function Dialer() {
           setShowIncomingCall(true);
           setIncomingPhoneNumber(call.customParameters.get("callerNumber"));
           setIncomingTwilioNumber(call.customParameters.get("calledNumber"));
-          call.accept();
+          setIncomingConnection(call);
+          call.on("accept", () => {
+            console.log("Call accepted, status:", call.status());
+          });
+          call.on("cancel", () => {
+            if (!acceptedRef.current && call.status() !== "open") {
+              setShowIncomingCall(false);
+            }
+          });
+          call.on("disconnect", () => {
+            console.log("Incoming call disconnected, status:", call.status());
+            setShowIncomingCall(false);
+            setIncomingPhoneNumber("");
+            setIncomingTwilioNumber("");
+            setIncomingConnection(null);
+          });
+          call.on("error", (err) => {
+            console.error("Call error:", err);
+          });
         });
         newDevice.on("unregistered", () => {
           console.log("Twilio Device unregistered");
@@ -93,6 +118,27 @@ function Dialer() {
     };
     setupDevice();
   }, [fromNumber]);
+
+  // Handler for accepting incoming call
+  const acceptIncoming = () => {
+    if (incomingConnection) {
+      acceptedRef.current = true;
+      incomingConnection.accept();
+    }
+  };
+
+  // Handler for rejecting incoming call
+  const rejectIncoming = () => {
+    if (incomingConnection) {
+      incomingConnection.reject();
+      setAccepted(false);
+      acceptedRef.current = false;
+      setShowIncomingCall(false);
+      setIncomingPhoneNumber("");
+      setIncomingTwilioNumber("");
+      setIncomingConnection(null);
+    }
+  };
 
   // useEffect to auto-trigger handleCall on startCall flag
   useEffect(() => {
@@ -264,7 +310,12 @@ function Dialer() {
   return (
     <div className="w-1/2">
       {showIncomingCall ? (
-        <IncomingWindow />
+        <IncomingWindow
+          incomingPhoneNumber={incomingPhoneNumber}
+          incomingTwilioNumber={incomingTwilioNumber}
+          acceptIncoming={acceptIncoming}
+          rejectIncoming={rejectIncoming}
+        />
       ) : isAddBusinessOn ? (
         <AddBusiness CloseAddBusiness={() => setAddBusinessOn(false)} />
       ) : (
