@@ -29,12 +29,12 @@ const callSlice = createSlice({
     addCallToHistory: (state, action) => {
       state.callHistory.push({
         phoneNumber: action.payload.phoneNumber,
-        twilioNumber: action.payload.twilioNumber,
         business: action.payload.business,
         type: action.payload.type,
         status: action.payload.status,
+        date: action.payload.date,
+        time: action.payload.time,
         duration: action.payload.duration,
-        timestamp: action.payload.timestamp,
       });
       try {
         localStorage.setItem("callHistory", JSON.stringify(state.callHistory));

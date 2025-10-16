@@ -32,6 +32,7 @@ function Dialer() {
   const activeCall = useRef(null);
   const callTimerRef = useRef(null);
   const acceptedRef = useRef(false);
+  const startTimeRef = useRef(null);
 
   const {
     inputValue = "",
@@ -64,7 +65,9 @@ function Dialer() {
     setShowIncomingCall,
     setIncomingPhoneNumber,
     setIncomingTwilioNumber,
-    setIncomingConnection
+    setIncomingConnection,
+    businesses,
+    startTimeRef
   );
 
   useEffect(() => {
@@ -78,6 +81,7 @@ function Dialer() {
       acceptedRef.current = true;
       setAccepted(true);
       incomingConnection.accept();
+      startTimeRef.current = Date.now();
     }
   };
 
@@ -95,6 +99,7 @@ function Dialer() {
       setIncomingPhoneNumber("");
       setIncomingTwilioNumber("");
       setIncomingConnection(null);
+      startTimeRef.current = null;
     }
   };
 

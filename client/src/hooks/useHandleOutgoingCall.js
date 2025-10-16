@@ -94,6 +94,8 @@ export function useHandleOutgoingCall({
             business:
               twilioNumbers.find((bus) => bus.value === fromNumber)?.label ||
               "",
+            type: "outgoing",
+            status: "",
             time: currentTime(),
             date: currentDate(),
             duration: formatDuration(callDuration), // Now callDuration is defined
