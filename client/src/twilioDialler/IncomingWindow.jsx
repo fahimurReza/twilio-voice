@@ -1,4 +1,7 @@
-import React from "react";
+import { BsPersonFill } from "react-icons/bs";
+import { FaPhoneFlip } from "react-icons/fa6";
+import { useSelector } from "react-redux";
+import { formatIncomingNumber } from "../utils";
 import "../style/incomingWindow.css";
 
 function IncomingWindow({
@@ -7,26 +10,39 @@ function IncomingWindow({
   acceptIncoming,
   rejectIncoming,
 }) {
+  const businesses = useSelector((state) => state.calls.businesses);
+  const formatedTwilioNumber = formatIncomingNumber(incomingTwilioNumber);
+  const business = businesses.find(
+    (bus) => bus.number === formatedTwilioNumber
+  );
+
   return (
-    <div className="incoming-window">
-      <div className="bg-white p-6 rounded-lg text-center">
-        <h3 className="text-lg font-bold mb-4">Incoming Call</h3>
-        <p className="mb-2">To: {incomingTwilioNumber || "Unknown"}</p>
-        <p className="mb-4">From: {incomingPhoneNumber || "Unknown"}</p>
-        <div className="space-x-4">
-          <button
-            onClick={acceptIncoming}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-          >
-            Accept
-          </button>
-          <button
-            onClick={rejectIncoming}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-          >
-            Reject
-          </button>
+    <div className="incoming-window h-[555px]">
+      <div className="p-5 rounded-2xl bg-white mt-18">
+        <div className="rounded-2xl bg-blue-100 flex justify-center items-center w-24 h-24">
+          <BsPersonFill size={60} />
         </div>
+      </div>
+
+      <p className="mt-6 text-3xl font-bold">
+        {formatIncomingNumber(incomingPhoneNumber) || "Unknown"}
+      </p>
+      <p className="mb-4 font-semibold">{business?.name || "Unknown"}</p>
+      <div className="space-x-20 mt-28">
+        <button
+          onClick={rejectIncoming}
+          className={`px-4 py-4 rounded-full transition focus:outline-none cursor-pointer 
+          bg-red-500 rotate-225 hover:bg-red-600`}
+        >
+          <FaPhoneFlip size={26} color="white" />
+        </button>
+        <button
+          onClick={acceptIncoming}
+          className={`px-4 py-4 rounded-full transition focus:outline-none cursor-pointer 
+          bg-blue-600 hover:bg-blue-800`}
+        >
+          <FaPhoneFlip size={26} color="white" />
+        </button>
       </div>
     </div>
   );

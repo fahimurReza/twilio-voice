@@ -84,7 +84,11 @@ function Dialer() {
   // Handler for rejecting incoming call
   const rejectIncoming = () => {
     if (incomingConnection) {
-      incomingConnection.reject();
+      if (acceptedRef.current) {
+        incomingConnection.disconnect();
+      } else {
+        incomingConnection.reject();
+      }
       setAccepted(false);
       acceptedRef.current = false;
       setShowIncomingCall(false);
