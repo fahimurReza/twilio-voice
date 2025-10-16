@@ -18,17 +18,18 @@ function IncomingWindow({
   );
 
   return (
-    <div className="incoming-window h-[555px]">
-      <div className="p-5 rounded-2xl bg-white mt-18">
-        <div className="rounded-2xl bg-blue-100 flex justify-center items-center w-24 h-24">
-          <BsPersonFill size={60} />
+    <div className="incoming-window h-[555px] w-full px-6 text-center">
+      <div className="p-4 rounded-2xl bg-white mt-18">
+        <div className="rounded-xl bg-blue-100 flex justify-center items-center w-24 h-24">
+          <BsPersonFill size={64} />
         </div>
       </div>
-
       <p className="mt-6 text-3xl font-bold">
-        {formatIncomingNumber(incomingPhoneNumber) || "Unknown"}
+        {formatIncomingNumber(incomingPhoneNumber) || "(888) 999-3333"}
       </p>
-      <p className="mb-4 font-semibold">{business?.name || "Unknown"}</p>
+      <p className="mb-4 text-lg font-semibold">
+        Business - {business?.name || "Texarkana Tree"}
+      </p>
       <div
         className={`relative mt-28 flex gap-24 w-full px-18 transition-all justify-center`}
       >
