@@ -200,6 +200,7 @@ function Dialer() {
           incomingTwilioNumber={incomingTwilioNumber}
           acceptIncoming={acceptIncoming}
           rejectIncoming={rejectIncoming}
+          acceptedRef={acceptedRef}
         />
       ) : isAddBusinessOn ? (
         <AddBusiness CloseAddBusiness={() => setAddBusinessOn(false)} />

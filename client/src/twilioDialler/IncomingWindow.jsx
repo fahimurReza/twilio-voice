@@ -9,6 +9,7 @@ function IncomingWindow({
   incomingTwilioNumber,
   acceptIncoming,
   rejectIncoming,
+  acceptedRef,
 }) {
   const businesses = useSelector((state) => state.calls.businesses);
   const formatedTwilioNumber = formatIncomingNumber(incomingTwilioNumber);
@@ -28,18 +29,29 @@ function IncomingWindow({
         {formatIncomingNumber(incomingPhoneNumber) || "Unknown"}
       </p>
       <p className="mb-4 font-semibold">{business?.name || "Unknown"}</p>
-      <div className="space-x-20 mt-28">
+      <div
+        className={`relative mt-28 flex gap-24 w-full px-18 transition-all justify-center`}
+      >
         <button
           onClick={rejectIncoming}
-          className={`px-4 py-4 rounded-full transition focus:outline-none cursor-pointer 
-          bg-red-500 rotate-225 hover:bg-red-600`}
+          className={`absolute px-4 py-4 rounded-full focus:outline-none cursor-pointer 
+          bg-red-500 rotate-225 hover:bg-red-600 transition-transform duration-500 
+          ease-in-out ${
+            acceptedRef.current
+              ? "translate-x-0 scale-110"
+              : "-translate-x-18 scale-100"
+          }`}
         >
           <FaPhoneFlip size={26} color="white" />
         </button>
         <button
           onClick={acceptIncoming}
-          className={`px-4 py-4 rounded-full transition focus:outline-none cursor-pointer 
-          bg-blue-600 hover:bg-blue-800`}
+          className={`absolute px-4 py-4 rounded-full focus:outline-none cursor-pointer 
+          bg-blue-600 hover:bg-blue-800 transition-all duration-500 ease-in-out ${
+            acceptedRef.current
+              ? "opacity-0 scale-90 translate-x-0 pointer-events-none"
+              : "opacity-100 scale-100 translate-x-18"
+          }`}
         >
           <FaPhoneFlip size={26} color="white" />
         </button>
