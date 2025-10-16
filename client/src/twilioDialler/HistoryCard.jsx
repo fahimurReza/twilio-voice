@@ -2,14 +2,14 @@ import { BsPersonFill } from "react-icons/bs";
 import { FaPhoneFlip } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
 import { useSelector, useDispatch } from "react-redux";
-import { removeCall, setCallInput } from "../store/store";
+import { removeCallHistory, setCallInput } from "../store/store";
 
 function HistoryCard({ record, index }) {
   const dispatch = useDispatch();
   const businesses = useSelector((state) => state.calls.businesses);
 
   const handleDelete = () => {
-    dispatch(removeCall(index));
+    dispatch(removeCallHistory(index));
   };
 
   const handleCall = () => {

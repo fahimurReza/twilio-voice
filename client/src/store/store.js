@@ -26,17 +26,24 @@ const callSlice = createSlice({
     startCall: false,
   },
   reducers: {
-    addCall: (state, action) => {
-      state.callHistory.push(action.payload);
+    addCallToHistory: (state, action) => {
+      state.callHistory.push({
+        phoneNumber: action.payload.phoneNumber,
+        twilioNumber: action.payload.twilioNumber,
+        business: action.payload.business,
+        type: action.payload.type,
+        status: action.payload.status,
+        duration: action.payload.duration,
+        timestamp: action.payload.timestamp,
+      });
       try {
         localStorage.setItem("callHistory", JSON.stringify(state.callHistory));
       } catch (err) {
         console.error("Failed to save call history:", err);
       }
     },
-    removeCall: (state, action) => {
+    removeCallHistory: (state, action) => {
       if (action.payload === undefined) {
-        console.error("removeCall: Index is undefined");
         return;
       }
       state.callHistory = state.callHistory.filter(
@@ -79,8 +86,8 @@ const callSlice = createSlice({
 });
 
 export const {
-  addCall,
-  removeCall,
+  addCallToHistory,
+  removeCallHistory,
   setCallInput,
   addBusiness,
   removeBusiness,

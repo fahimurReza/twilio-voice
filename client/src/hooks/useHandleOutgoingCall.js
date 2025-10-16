@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { setCallInput, addCall } from "../store/store";
+import { setCallInput, addCallToHistory } from "../store/store";
 import {
   formatDuration,
   currentTime,
@@ -89,7 +89,7 @@ export function useHandleOutgoingCall({
           callTimerRef.current = null;
         }
         dispatch(
-          addCall({
+          addCallToHistory({
             phoneNumber: formatNumber(digits),
             business:
               twilioNumbers.find((bus) => bus.value === fromNumber)?.label ||
