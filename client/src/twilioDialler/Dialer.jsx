@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { addCall, setCallInput } from "../store/store";
+import { setCallInput } from "../store/store";
 import { useTwilioDevice } from "../hooks/useTwilioDevice";
+import { useHandleOutgoingCall } from "../hooks/useHandleOutgoingCall";
 import DialPad from "./DialPad";
 import AddBusiness from "./AddBusiness";
 import NumberInput from "./NumberInput";
@@ -11,12 +12,7 @@ import MakeCallButton from "./MakeCallButton";
 import DeleteButton from "./DeleteButton";
 import AddBusinessButton from "./AddBusinessButton";
 import IncomingWindow from "./IncomingWindow";
-import {
-  timeFormatter,
-  currentTime,
-  currentDate,
-  formatNumber,
-} from "../utils";
+import { timeFormatter, formatNumber } from "../utils";
 
 function Dialer() {
   const [device, setDevice] = useState(null);
@@ -98,12 +94,12 @@ function Dialer() {
     }
   };
 
-  // useEffect to auto-trigger handleCall on startCall flag
+  // useEffect to auto-trigger handleOutgoingCall on startCall flag
   useEffect(() => {
     if (startCall && device && fromNumber && inputValue) {
       setIsSelectError(false);
       setAddBusinessOn(false);
-      handleCall();
+      handleOutgoingCall();
       dispatch(
         setCallInput({ phoneNumber: inputValue, fromNumber, startCall: false })
       );
@@ -129,7 +125,7 @@ function Dialer() {
   };
 
   const handleInputEnter = (e) => {
-    e.key === "Enter" && handleCall();
+    e.key === "Enter" && handleOutgoingCall();
   };
 
   const handleDialPress = (digit) => {
@@ -175,95 +171,22 @@ function Dialer() {
       : null;
   };
 
-  const handleCall = async () => {
-    if (!fromNumber) {
-      setIsSelectError(true);
-      setErrorMessage("Please Select a Business");
-      return;
-    }
-    if (!device) {
-      setErrorMessage("Please Connect the Server");
-      return;
-    }
-    if (!inputValue) {
-      setErrorMessage("Please Enter a Number");
-      return;
-    }
-    if (inputValue.length < 14) {
-      setErrorMessage("Invalid Number");
-      return;
-    }
-    if (callInProgress && activeCall.current) {
-      activeCall.current.disconnect();
-      setCallInProgress(false);
-      setStatusMessage("Call Ended");
-      activeCall.current = null;
-      return;
-    }
-
-    const digits = inputValue.replace(/\D/g, "");
-
-    dispatch(
-      setCallInput({
-        phoneNumber: formatNumber(digits),
-        fromNumber,
-        startCall: false,
-      })
-    );
-
-    const numberToCall = "+1" + digits;
-    setStatusMessage("Calling...");
-    setErrorMessage("");
-    setCallDuration(0);
-
-    try {
-      const newCall = await device.connect({
-        params: { To: numberToCall, From: fromNumber },
-      });
-      activeCall.current = newCall;
-      setCallInProgress(true);
-
-      newCall.on("accept", () => {
-        setStatusMessage("");
-        setCallDuration(0);
-        callTimerRef.current = setInterval(() => {
-          setCallDuration((prev) => prev + 1);
-        }, 1000);
-      });
-      newCall.on("disconnect", () => {
-        setCallInProgress(false);
-        setStatusMessage("Call Ended");
-        dispatch(
-          setCallInput({ phoneNumber: "", fromNumber: "", startCall: false })
-        );
-        if (callTimerRef.current) {
-          clearInterval(callTimerRef.current);
-          callTimerRef.current = null;
-        }
-        dispatch(
-          addCall({
-            phoneNumber: formatNumber(digits),
-            business:
-              twilioNumbers.find((bus) => bus.value === fromNumber)?.label ||
-              "",
-            time: currentTime(),
-            date: currentDate(),
-            duration: timeFormatter(callDuration),
-          })
-        );
-        setTimeout(() => {
-          setStatusMessage("");
-        }, 4000);
-        activeCall.current = null;
-      });
-    } catch (err) {
-      console.error("Call failed:", err);
-      setErrorMessage("Invalid Number or Call Failed");
-      setCallInProgress(false);
-      setStatusMessage("");
-      activeCall.current = null;
-    }
-  };
+  // Use the custom Twilio Call hook
+  const { handleOutgoingCall } = useHandleOutgoingCall({
+    device,
+    fromNumber,
+    inputValue,
+    callInProgress,
+    setCallInProgress,
+    setErrorMessage,
+    setStatusMessage,
+    setCallDuration,
+    dispatch,
+    activeCall,
+    callTimerRef,
+    twilioNumbers,
+    setIsSelectError,
+  });
 
   return (
     <div className="w-1/2">
@@ -309,7 +232,7 @@ function Dialer() {
           <DialPad onPress={handleDialPress} onDelete={handleDelete} />
           <div className="relative flex justify-center items-center w-full mt-4">
             <MakeCallButton
-              handleCall={handleCall}
+              handleOutgoingCall={handleOutgoingCall}
               callInProgress={callInProgress}
             />
             <DeleteButton handleDelete={handleDelete} inputValue={inputValue} />

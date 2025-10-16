@@ -1,9 +1,9 @@
 import { FaPhoneFlip } from "react-icons/fa6";
 
-function MakeCallButton({ handleCall, callInProgress }) {
+function MakeCallButton({ handleOutgoingCall, callInProgress }) {
   return (
     <button
-      onClick={handleCall}
+      onClick={handleOutgoingCall}
       className={`px-4 py-4 rounded-full transition focus:outline-none cursor-pointer ${
         callInProgress ? "bg-red-500" : "bg-blue-600 hover:bg-blue-800"
       }`}
