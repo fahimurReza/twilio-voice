@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { setCallInput, addCall } from "../store/store";
 import {
-  timeFormatter,
+  formatDuration,
   currentTime,
   currentDate,
   formatNumber,
@@ -96,7 +96,7 @@ export function useHandleOutgoingCall({
               "",
             time: currentTime(),
             date: currentDate(),
-            duration: timeFormatter(callDuration), // Now callDuration is defined
+            duration: formatDuration(callDuration), // Now callDuration is defined
           })
         );
         setTimeout(() => {

@@ -12,7 +12,7 @@ import MakeCallButton from "./MakeCallButton";
 import DeleteButton from "./DeleteButton";
 import AddBusinessButton from "./AddBusinessButton";
 import IncomingWindow from "./IncomingWindow";
-import { timeFormatter, formatNumber } from "../utils";
+import { formatDuration, formatNumber } from "../utils";
 
 function Dialer() {
   const [device, setDevice] = useState(null);
@@ -232,7 +232,7 @@ function Dialer() {
             callDuration={callDuration}
             statusMessage={statusMessage}
             errorMessage={errorMessage}
-            timeFormatter={timeFormatter}
+            formatDuration={formatDuration}
           />
           <DialPad onPress={handleDialPress} onDelete={handleDelete} />
           <div className="relative flex justify-center items-center w-full mt-4">

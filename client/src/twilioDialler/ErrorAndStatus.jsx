@@ -6,13 +6,13 @@ function ErrorAndStatus({
   callDuration,
   statusMessage,
   errorMessage,
-  timeFormatter,
+  formatDuration,
 }) {
   return (
     <div className="h-1 flex items-center justify-center mb-2">
       {callInProgress && callTimerRef.current ? (
         <p className="text-green-600 text-base">
-          {timeFormatter(callDuration)}
+          {formatDuration(callDuration)}
         </p>
       ) : statusMessage ? (
         <p className="text-green-600 text-base">{statusMessage}</p>
