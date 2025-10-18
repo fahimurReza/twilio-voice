@@ -16,13 +16,13 @@ const VoiceGrant = AccessToken.VoiceGrant;
 const twilioAccountSid = process.env.TWILIO_ACCOUNT_SID;
 const twilioApiKey = process.env.TWILIO_API_KEY;
 const twilioApiSecret = process.env.TWILIO_API_SECRET;
-const outgoingApplicationSid = process.env.TWIML_APP_SID_OUTGOING;
+const applicationSid = process.env.TWIML_APP_SID;
 
 app.get("/token", (req, res) => {
   const identity = "webuser";
   const selectedFrom = req.query.from;
   const voiceGrant = new VoiceGrant({
-    outgoingApplicationSid: outgoingApplicationSid,
+    applicationSid: applicationSid,
     incomingAllow: true,
     callerId: selectedFrom,
   });
