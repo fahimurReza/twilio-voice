@@ -21,7 +21,8 @@ export function useHandleOutgoingCall({
   callTimerRef,
   twilioNumbers,
   setIsSelectError,
-  callDuration, // Added callDuration to dependencies
+  callDuration,
+  startTimeRef,
 }) {
   const handleOutgoingCall = useCallback(async () => {
     if (!fromNumber) {
@@ -46,6 +47,7 @@ export function useHandleOutgoingCall({
       setCallInProgress(false);
       setStatusMessage("Call Ended");
       activeCall.current = null;
+      startTimeRef.current = null;
       return;
     }
 
@@ -74,6 +76,7 @@ export function useHandleOutgoingCall({
       newCall.on("accept", () => {
         setStatusMessage("");
         setCallDuration(0);
+        startTimeRef.current = Date.now();
         callTimerRef.current = setInterval(() => {
           setCallDuration((prev) => prev + 1);
         }, 1000);
@@ -88,6 +91,9 @@ export function useHandleOutgoingCall({
           clearInterval(callTimerRef.current);
           callTimerRef.current = null;
         }
+        const duration = startTimeRef.current
+          ? Math.floor((Date.now() - startTimeRef.current) / 1000)
+          : 0;
         dispatch(
           addCallToHistory({
             phoneNumber: formatNumber(digits),
@@ -98,7 +104,7 @@ export function useHandleOutgoingCall({
             status: "",
             time: currentTime(),
             date: currentDate(),
-            duration: formatDuration(callDuration), // Now callDuration is defined
+            duration: formatDuration(duration),
           })
         );
         setTimeout(() => {
@@ -127,7 +133,7 @@ export function useHandleOutgoingCall({
     callTimerRef,
     twilioNumbers,
     setIsSelectError,
-    callDuration, // Added callDuration to useCallback dependencies
+    callDuration,
   ]);
 
   return { handleOutgoingCall };

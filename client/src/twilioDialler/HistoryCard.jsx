@@ -1,8 +1,9 @@
+import { useSelector, useDispatch } from "react-redux";
+import { removeCallHistory, setCallInput } from "../store/store";
 import { BsPersonFill } from "react-icons/bs";
 import { FaPhoneFlip } from "react-icons/fa6";
 import { MdDelete } from "react-icons/md";
-import { useSelector, useDispatch } from "react-redux";
-import { removeCallHistory, setCallInput } from "../store/store";
+import { HiOutlineChevronDoubleUp } from "react-icons/hi";
 
 function HistoryCard({ record, index }) {
   const dispatch = useDispatch();
@@ -23,21 +24,41 @@ function HistoryCard({ record, index }) {
     );
   };
 
+  const isMissed = record.type === "incoming" && record.status === "missed";
+  const isRejected = record.type === "incoming" && record.status === "rejected";
+  const isIncoming = record.type === "incoming";
+
   return (
     <div>
       <div
-        className="mx-3 py-1 px-3 rounded-md flex items-center hover:bg-blue-100 
+        className="mx-3 py-1 pr-3 rounded-md flex items-center hover:bg-blue-100 
         group border-b border-blue-300"
       >
+        <div
+          className={`${
+            record.type === "outgoing" ? "pr-2" : "rotate-180 pl-2"
+          }`}
+        >
+          <HiOutlineChevronDoubleUp color={`${isIncoming ? "blue" : ""}`} />
+        </div>
         <div
           className="rounded-md bg-blue-200 group-hover:bg-white group-hover:border 
         group-hover:border-blue-300 flex justify-center items-center w-10 h-10"
         >
           <BsPersonFill size={26} />
         </div>
-        <div className="ml-3 h-12 flex flex-col justify-center">
+        <div
+          className={`ml-3 h-12 flex flex-col justify-center ${
+            isMissed ? "text-red-500" : ""
+          }`}
+        >
           <div className="text-base">{record.phoneNumber}</div>
-          <div className="text-[13px] text-gray-600">{record.business}</div>
+          <div className="text-[13px] text-gray-600">
+            {record.business}{" "}
+            <span className={`${isMissed ? "text-red-500" : ""}`}>
+              - {isMissed || isRejected ? record.status : record.duration}
+            </span>
+          </div>
         </div>
         <div
           className="ml-auto rounded-md justify-center items-center w-9 h-9 cursor-pointer 

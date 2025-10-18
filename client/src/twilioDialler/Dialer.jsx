@@ -61,12 +61,12 @@ function Dialer() {
     setAccepted,
     accepted,
   } = useTwilioDevice(
-    fromNumber,
+    fromNumber || null,
     setShowIncomingCall,
     setIncomingPhoneNumber,
     setIncomingTwilioNumber,
     setIncomingConnection,
-    businesses,
+    businesses || [],
     startTimeRef
   );
 
@@ -195,6 +195,7 @@ function Dialer() {
     callTimerRef,
     twilioNumbers,
     setIsSelectError,
+    startTimeRef,
   });
 
   return (
