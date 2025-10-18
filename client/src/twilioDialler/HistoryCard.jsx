@@ -49,13 +49,13 @@ function HistoryCard({ record, index }) {
         </div>
         <div
           className={`ml-3 h-12 flex flex-col justify-center ${
-            isMissed ? "text-red-500" : ""
+            isMissed || isRejected ? "text-red-500" : ""
           }`}
         >
           <div className="text-base">{record.phoneNumber}</div>
           <div className="text-[13px] text-gray-600">
             {record.business}{" "}
-            <span className={`${isMissed ? "text-red-500" : ""}`}>
+            <span className={`${isMissed || isRejected ? "text-red-500" : ""}`}>
               - {isMissed || isRejected ? record.status : record.duration}
             </span>
           </div>
