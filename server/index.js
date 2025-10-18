@@ -61,6 +61,9 @@ app.all("/voice", (req, res) => {
     // Normal PSTN call
     const dial = twiml.dial({ callerId: fromNumber });
     dial.number(toNumber);
+  } else {
+    // No number provided
+    twiml.say("No number provided to connect the call.");
   }
 
   res.type("text/xml");
