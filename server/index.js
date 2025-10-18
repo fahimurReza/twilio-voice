@@ -42,24 +42,8 @@ app.get("/token", (req, res) => {
 app.all("/voice", (req, res) => {
   const twiml = new VoiceResponse();
 
-  const toNumber =
-    req.body?.To ||
-    req.body?.to ||
-    req.body?.params?.To ||
-    req.query?.To ||
-    "+15551234567";
-
-  const fromNumber =
-    req.body?.From ||
-    req.body?.from ||
-    req.body?.params?.From ||
-    req.query?.From ||
-    process.env.TWILIO_NUMBER; // fallback to default
-
-  console.log("From", req.body?.From);
-  console.log("from", req.body?.from);
-  console.log("params from", req.body?.params?.From);
-  console.log("query From", req.query?.From);
+  const toNumber = req.body?.To;
+  const fromNumber = req.body?.From;
 
   const dial = twiml.dial({ callerId: fromNumber });
   dial.number(toNumber);
