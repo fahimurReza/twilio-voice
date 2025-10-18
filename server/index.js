@@ -56,6 +56,11 @@ app.all("/voice", (req, res) => {
     req.query?.From ||
     process.env.TWILIO_NUMBER; // fallback to default
 
+  console.log("From", req.body?.From);
+  console.log("from", req.body?.from);
+  console.log("params from", req.body?.params?.From);
+  console.log("query From", req.query?.From);
+
   const dial = twiml.dial({ callerId: fromNumber });
   dial.number(toNumber);
 
