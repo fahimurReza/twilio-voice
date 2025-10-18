@@ -54,8 +54,8 @@ function HistoryCard({ record, index }) {
         >
           <div className="text-base">{record.phoneNumber}</div>
           <div className="text-[13px] text-gray-600">
-            {record.business}{" "}
-            <span className={`${isMissed || isRejected ? "text-red-500" : ""}`}>
+            {record.business}
+            <span>
               - {isMissed || isRejected ? record.status : record.duration}
             </span>
           </div>
