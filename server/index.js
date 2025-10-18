@@ -22,7 +22,7 @@ app.get("/token", (req, res) => {
   const identity = "webuser";
   const selectedFrom = req.query.from;
   const voiceGrant = new VoiceGrant({
-    applicationSid: applicationSid,
+    outgoingApplicationSid: applicationSid,
     incomingAllow: true,
     callerId: selectedFrom,
   });
