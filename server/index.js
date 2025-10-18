@@ -48,7 +48,6 @@ app.all("/voice", (req, res) => {
   const conferenceName = req.query?.conferenceName;
 
   if (conferenceName) {
-    // Join the conference (3-way call scenario)
     const dial = twiml.dial({ callerId: fromNumber });
     dial.conference(conferenceName, {
       startConferenceOnEnter: true,
@@ -58,11 +57,9 @@ app.all("/voice", (req, res) => {
         "http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical",
     });
   } else if (toNumber) {
-    // Normal PSTN call
     const dial = twiml.dial({ callerId: fromNumber });
     dial.number(toNumber);
   } else {
-    // No number provided
     twiml.say("No number provided to connect the call.");
   }
 
@@ -81,6 +78,48 @@ app.all("/voice-webhook", (req, res) => {
 
   res.type("text/xml");
   res.send(twiml.toString());
+});
+
+app.post("/merge-to-conference", async (req, res) => {
+  try {
+    const { callSid1, callSid2 } = req.body;
+    if (!callSid1 || !callSid2) {
+      return res.status(400).send({ error: "Both call SIDs are required" });
+    }
+    const conferenceName = `conf_${Date.now()}`;
+    const client = require("twilio")(
+      process.env.TWILIO_ACCOUNT_SID,
+      process.env.TWILIO_AUTH_TOKEN
+    );
+    await client.calls(callSid1).update({
+      url: `${process.env.BASE_URL}/conference-join?conferenceName=${conferenceName}`,
+      method: "POST",
+    });
+    await client.calls(callSid2).update({
+      url: `${process.env.BASE_URL}/conference-join?conferenceName=${conferenceName}`,
+      method: "POST",
+    });
+    res.send({ success: true, conferenceName });
+  } catch (err) {
+    console.error("Error merging calls:", err);
+    res.status(500).send({ error: err.message });
+  }
+});
+
+app.post("/conference-join", (req, res) => {
+  const { conferenceName } = req.query;
+  const response = new VoiceResponse();
+
+  const dial = response.dial();
+  dial.conference(conferenceName, {
+    startConferenceOnEnter: true,
+    endConferenceOnExit: false,
+    beep: "true",
+    waitUrl: "http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical",
+  });
+
+  res.type("text/xml");
+  res.send(response.toString());
 });
 
 const PORT = 5000;
