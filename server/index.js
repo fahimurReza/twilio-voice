@@ -45,8 +45,23 @@ app.all("/voice", (req, res) => {
   const toNumber = req.body?.To;
   const fromNumber = req.body?.From;
 
-  const dial = twiml.dial({ callerId: fromNumber });
-  dial.number(toNumber);
+  const conferenceName = req.query?.conferenceName;
+
+  if (conferenceName) {
+    // Join the conference (3-way call scenario)
+    const dial = twiml.dial({ callerId: fromNumber });
+    dial.conference(conferenceName, {
+      startConferenceOnEnter: true,
+      endConferenceOnExit: false,
+      beep: "true",
+      waitUrl:
+        "http://twimlets.com/holdmusic?Bucket=com.twilio.music.classical",
+    });
+  } else if (toNumber) {
+    // Normal PSTN call
+    const dial = twiml.dial({ callerId: fromNumber });
+    dial.number(toNumber);
+  }
 
   res.type("text/xml");
   res.send(twiml.toString());
